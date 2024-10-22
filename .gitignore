@@ -1,0 +1,6 @@
+# Ignore all GIMP files.
+*.xcf
+
+# Ignore most compilation files.
+*.sym
+*.obj
