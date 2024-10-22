@@ -25,8 +25,8 @@ john.pic: res/johnplaceholder.bmp
 	$(GFXCONV) -s 16 -o 16 -u 16 -t bmp -i $<
 
 # BACKGROUNDS
-# coltest.pic: res/BgColTest.bmp
-	# @echo convert bmp ... $(notdir $@)
-	# $(GFXCONV) -s 8 -o 16 -u 16 -e 0 -t bmp -p -m -i $<
+bg_icons.pic: res/bg_icons.bmp
+	@echo convert bmp ... $(notdir $@)
+	$(GFXCONV) -s 8 -o 16 -u 16 -e 0 -t bmp -p -m -i $<
 
-bitmaps : john.pic
+bitmaps : john.pic bg_icons.pic

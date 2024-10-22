@@ -16,16 +16,16 @@ johnpal_end:
 ;;;;;;;;;;;;;;;
 ; Backgrounds ;
 ;;;;;;;;;;;;;;;
-; coltestbg:
-; .incbin "res/BgColTest.pic"
-; coltestbg_end:
+iconsbg:
+.incbin "res/bg_icons.pic"
+iconsbg_end:
 
-; coltestpal:
-; .incbin "res/BgColTest.pal"
-; coltestpal_end:
+iconspal:
+.incbin "res/bg_icons.pal"
+iconspal_end:
 
-; coltestmap:
-; .incbin "res/BgColTest.map"
-; coltestmap_end:
+iconsmap:
+.incbin "res/bg_icons.map"
+iconsmap_end:
 
 .ends

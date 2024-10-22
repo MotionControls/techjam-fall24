@@ -8,11 +8,9 @@ extern char johnspr, johnspr_end;
 extern char johnpal, johnpal_end;
 
 // BGs
-/*
-extern char coltestbg, coltestbg_end;
-extern char coltestpal, coltestpal_end;
-extern char coltestmap, coltestmap_end;
-*/
+extern char iconsbg, iconsbg_end;
+extern char iconspal, iconspal_end;
+extern char iconsmap, iconsmap_end;
 
 // Screen Stuffs
 #define RES_X			256
@@ -92,6 +90,22 @@ int main(void){
 	oamSet(0, 100, 100, 3, 0, 0, 0, 0);
     oamSetEx(0, OBJ_SMALL, 1);
     oamSetVisible(0, OBJ_SHOW);
+	
+	// Init BG stuffs.
+	bgInitTileSet(
+		0,
+		&iconsbg, &iconspal, 0,
+		(&iconsbg_end - &iconsbg), (&iconspal_end - &iconspal),
+		BG_16COLORS,
+		MEM_BACKGROUNDS
+	);
+	
+	bgInitMapSet(
+		0,
+		&iconsmap, (&iconsmap_end - &iconsmap),
+		SC_32x32,
+		MEM_MAPS
+	);
 	
 	// This needs to be done after ANY new backgrounds are loaded.
 	// All accessible backgrounds are enabled by default.
