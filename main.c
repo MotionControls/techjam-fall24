@@ -23,10 +23,58 @@ extern char coltestmap, coltestmap_end;
 #define MEM_BACKGROUNDS		0x6000
 #define MEM_MAPS			0x0000
 
+// Sprite Tables
+// The way these tables work is that each value represents a point in memory from the OAM tileset.
+// Each value should point towards the top-left corner of a given sprite.
+// The location of each sprite (after loading) can be easily seen through something like Mesen.
+const u8 playerSpriteTable[1] = {
+	0	// Where the data??? Can't find the data??? Whyre is the dtaa???
+};
+
+// Structs
+enum PlayerStates{	// TODO: Explain how these work in tandem with playerSpriteTable.
+	PS_IDLE	= 0
+};
+
+typedef struct{
+	// Position
+	u8 rx, ry;	// The on-screen position.
+	ufx x, y;	// The real position. Unsigned fixed number.
+	sfx cx, cy;	// The change in position. Signed fixed number.
+	ufx speed;	// How fast the player moves in any given direction. Unsigned fixed number.
+	
+	// Sprites
+	u8 oamID;
+	u8 curFrame;		// The index of the current frame from playerSpriteTable.
+	u8 sprState;		// The sprite state of the player. Values must be from PlayerStates
+	u8 frameTimer;		// The amount of time the current frame has lasted.
+	u8 timePerFrame;	// The max amount of time each frame can last.
+	u8 visible;			// Whether or not sprite is visible.
+	u8 hortFlip;		// Whether or not to flip the player sprite horizontally.
+						// I don't suspect we'll need vertFlip but it's easy to add if we do.
+}Player;
+
+// Init globals.
 u16 pad0, storePad0;	// pad0 = Current Input
 						// storePad0 = Last Frame's Input
 
+// Function protos.
+u8 CheckCollision(Player player, u8* arr, u8 xStart, u8 xRange, u8 yStart, u8 yRange);
+void Player_Step(Player *player);
+
 int main(void){
+	// Init player.
+	Player player = {
+		0, 0,
+		CharToUFX(100, 0), CharToUFX(100, 0),
+		0, 0,
+		CharToUFX(1, 0),
+		
+		0, 0, 0, 0, 0,
+		1,
+		0
+	};
+	
 	// Init SNES
 	consoleInit();
 	
@@ -76,10 +124,47 @@ int main(void){
 	
 	// Game Loop.
 	while (1){
-		// Updating relevant objects.
-		oamSet(0, 100, 100, 3, 0, 0, 0, 0);
+		// Poll input.
+		storePad0 = pad0;
+		pad0 = padsCurrent(0);
+		
+		// Step OAM objects.
+		Player_Step(&player);
 		
 		WaitForVBlank();
 	}
 	return 0;
 }
+
+// Functions
+/*	void Player_Step()
+	Does all player-related duties when called.
+*/
+void Player_Step(Player *player){
+	// Physics.
+	player->cx = player->cy = 0;
+	if(pad0){	// If a button has been pressed.
+		if(pad0 & KEY_LEFT)
+			player->cx = -player->speed;
+		if(pad0 & KEY_RIGHT)
+			player->cx = player->speed;
+		if(pad0 & KEY_UP)
+			player->cy = -player->speed;
+		if(pad0 & KEY_DOWN)
+			player->cy = player->speed;
+	}
+	
+	player->x += player->cx;
+	player->y += player->cy;
+	
+	player->rx = UFXToChar(player->x);
+	player->ry = UFXToChar(player->y);
+	
+	// Update player OAM object.
+	oamSet(player->oamID, player->rx, player->ry, 3, player->hortFlip, 0, playerSpriteTable[player->curFrame + player->sprState], 0);
+}
+
+/*	TODO
+	Returns 1 if collision, 0 otherwise.
+*/
+u8 CheckCollision(Player player, u8* arr, u8 xStart, u8 xRange, u8 yStart, u8 yRange){}
