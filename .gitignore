@@ -4,3 +4,4 @@
 # Ignore most compilation files.
 *.sym
 *.obj
+linkfile
