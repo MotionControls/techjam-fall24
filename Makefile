@@ -22,7 +22,7 @@ clean: cleanBuildRes cleanRom cleanGfx
 # SPRITES
 john.pic: res/johnplaceholder.bmp
 	@echo convert bitmap ... $(notdir $@)
-	$(GFXCONV) -s 16 -o 16 -u 16 -t bmp -i $<
+	$(GFXCONV) -s 32 -o 16 -u 16 -t bmp -i $<
 
 # BACKGROUNDS
 bg_icons.pic: res/bg_icons.bmp

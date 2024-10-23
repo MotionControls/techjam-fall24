@@ -21,6 +21,13 @@ extern char iconsmap, iconsmap_end;
 #define MEM_BACKGROUNDS		0x6000
 #define MEM_MAPS			0x0000
 
+// Sprite Stuffs
+// https://github.com/alekmaul/pvsneslib/wiki/Sprites#sprite-sizes
+#define SPR_SIZE_8x8		0 << 5
+#define SPR_SIZE_16x16		3 << 5
+#define SPR_SIZE_32x32		5 << 5
+#define SPR_SIZE_16x32		6 << 5
+
 // Player Stuffs
 #define PLAYER_OAMID		0	// This is ideally the ONLY OAM that should be const.
 #define PLAYER_HORT			16
@@ -39,6 +46,9 @@ extern char iconsmap, iconsmap_end;
 #define BULLET_SPRITES_SIZE	(&johnspr_end - &johnspr)
 #define BULLET_PALETTE_SIZE	(&johnpal_end - &johnpal)	// The bullet palette cannot be const due to the colors of the bullet changing.
 														// The size of the palette SHOULD remain constant.
+
+// BG Stuffs
+#define BG_MAP_SIZE			(&iconsmap_end - &iconsmap)	// Given each background is 256x256, they should all very conveniently have the same map size.
 
 // Sprite Tables
 // The way these tables work is that each value represents a point in memory from the OAM tileset.
@@ -63,7 +73,7 @@ typedef struct{
 	
 	// Sprites
 	u8 curFrame;		// The index of the current frame from playerSpriteTable.
-	u8 sprState;		// The sprite state of the player. Values must be from PlayerStates
+	u8 sprState;		// The sprite state of the player. Values must be from PlayerStates.
 	u8 frameTimer;		// The amount of time the current frame has lasted.
 	u8 timePerFrame;	// The max amount of time each frame can last.
 	u8 visible;			// Whether or not sprite is visible.
@@ -113,7 +123,7 @@ int main(void){
 		&iconsbg, (&iconsbg_end - &iconsbg),
 		&iconspal, (&iconspal_end - &iconspal), 0,
 		MEM_BACKGROUNDS,
-		&iconsmap, (&iconsmap_end - &iconsmap),
+		&iconsmap, BG_MAP_SIZE,
 		MEM_MAPS
 	);
 	
@@ -164,8 +174,7 @@ Player Player_Init(u8 x, u8 y, ufx speed){
 		PLAYER_PALETTE, PLAYER_PALETTE_SIZE,	// Palette + Length
 		PLAYER_PALETTE_BANK,					// Palette Bank
 		MEM_SPRITES,							// Where to put sprites.
-		3 << 5									// Size of sprites.
-												// https://github.com/alekmaul/pvsneslib/wiki/Sprites#sprite-sizes
+		SPR_SIZE_16x32							// Size of sprites.
 	);
 	oamSet(PLAYER_OAMID, player.rx, player.ry, 3, 0, 0, 0, 0);
     oamSetEx(PLAYER_OAMID, OBJ_SMALL, 1);
@@ -192,7 +201,7 @@ void Player_Step(Player *player){
 			player->cy = player->speed;
 		
 		// Shooting
-		
+		// BIG BIG TODO
 	}
 	
 	player->x += player->cx;
@@ -225,5 +234,9 @@ void BG_Change(u8 index, u8* tiles, u16 tilesSize, u8* palette, u16 paletteSize,
 
 /*	TODO
 	Returns 1 if collision, 0 otherwise.
+player			;	...
+arr				;	1D level array.
+xStart, yStart	;	What part of the array to start the sweep at.
+xRange, yRange	;	How much of the array to sweep.
 */
 u8 CheckCollision(Player player, u8* arr, u8 xStart, u8 xRange, u8 yStart, u8 yRange){}
