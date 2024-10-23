@@ -50,6 +50,10 @@ extern char iconsmap, iconsmap_end;
 // BG Stuffs
 #define BG_MAP_SIZE			(&iconsmap_end - &iconsmap)	// Given each background is 256x256, they should all very conveniently have the same map size.
 
+// Level Stuffs
+#define LEVEL_TILE_SIZE		16
+#define LEVEL_MAX_TARGETS	8
+
 // Sprite Tables
 // The way these tables work is that each value represents a point in memory from the OAM tileset.
 // Each value should point towards the top-left corner of a given sprite.
@@ -97,7 +101,33 @@ typedef struct{
 	u8* palette;
 }Bullet;
 
+// This may not be needed? If they share the same variables then I don't see a reason to not reuse Bullet as Target.
+typedef struct{
+	// Position
+	// Same functions as in player.
+	u8 rx, ry;
+	ufx x, y;
+	sfx cx, cy;
+	ufx speed;
+	
+	// Sprites
+	u8 oamID;
+	u8 visible;
+	u8 hortFlip;
+	u8 vertFlip;
+	u8* palette;
+}Target;
+
+typedef struct{
+	u8 *tiles, *palette, *map;							// BG Data
+	u16 tilesSize, paletteSize, mapSize;				// BG Data Sizes
+	u8 xSpawn, ySpawn;									// Player's Spawn Position
+	u8 collision[LEVEL_TILE_SIZE * LEVEL_TILE_SIZE];	// Collision Array
+	Target targets[LEVEL_MAX_TARGETS];					// Target Array
+}Level;
+
 // Init globals.
+Level levels[1];		// Level Array
 u16 pad0, storePad0;	// pad0 = Current Input
 						// storePad0 = Last Frame's Input
 
