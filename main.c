@@ -22,13 +22,14 @@ extern char iconsmap, iconsmap_end;
 #define MEM_MAPS			0x0000
 
 // Player Stuffs
-#define PLAYER_OAM_ID		0	// This is ideally the ONLY OAM that should be const.
+#define PLAYER_OAMID		0	// This is ideally the ONLY OAM that should be const.
 #define PLAYER_HORT			16
 #define PLAYER_VERT			32
 #define PLAYER_SPRITES		&johnspr
 #define PLAYER_SPRITES_SIZE	(&johnspr_end - &johnspr)
 #define PLAYER_PALETTE		&johnpal
 #define PLAYER_PALETTE_SIZE	(&johnpal_end - &johnpal)
+#define PLAYER_PALETTE_BANK	0
 
 // Bullet Stuffs
 #define BULLET_MAX_BULLETS	3
@@ -92,38 +93,16 @@ u16 pad0, storePad0;	// pad0 = Current Input
 
 // Function protos.
 u8 CheckCollision(Player player, u8* arr, u8 xStart, u8 xRange, u8 yStart, u8 yRange);
+Player Player_Init(u8 x, u8 y, ufx speed);
 void Player_Step(Player *player);
 
 int main(void){
-	// Init player.
-	Player player = {
-		0, 0,
-		CharToUFX(100, 0), CharToUFX(100, 0),
-		0, 0,
-		CharToUFX(1, 0),
-		
-		0, 0, 0, 0,
-		1,
-		0
-	};
-	
 	// Init SNES
 	consoleInit();
 	
-	// Init OAM stuffs.
-	// The OAM ID should be in increments of 4.
-	// ex. Player = 0, Enemy = 4
-	oamInitGfxSet(
-		&johnspr, (&johnspr_end - &johnspr),	// Sprites + Length
-		&johnpal, (&johnpal_end - &johnpal),	// Palette + Length
-		0,										// Palette Bank
-		MEM_SPRITES,							// Where to put sprites.
-		3 << 5									// Size of sprites.
-												// https://github.com/alekmaul/pvsneslib/wiki/Sprites#sprite-sizes
-	);
-	oamSet(0, 100, 100, 3, 0, 0, 0, 0);
-    oamSetEx(0, OBJ_SMALL, 1);
-    oamSetVisible(0, OBJ_SHOW);
+	// Init player.
+	// The OAM can only be used AFTER consoleInit so this should be done afterwards.
+	Player player = Player_Init(100, 100, CharToUFX(1, 0));
 	
 	// Init BG stuffs.
 	bgInitTileSet(
@@ -185,13 +164,47 @@ int main(void){
 }
 
 // Functions
-/*	void Player_Step()
+/*	Player Player_Init(x, y, speed);
+	Returns a player struct.
+x, y	;	Starting position.
+speed	;	Starting speed.
+*/
+Player Player_Init(u8 x, u8 y, ufx speed){
+	// Init player.
+	Player player = {
+		x, y,
+		CharToUFX(x, 0), CharToUFX(y, 0),
+		0, 0,
+		speed,
+		0,0,0,0,
+		1,
+		0
+	};
+	
+	// Init OAM object.
+	oamInitGfxSet(
+		PLAYER_SPRITES, PLAYER_SPRITES_SIZE,	// Sprites + Length
+		PLAYER_PALETTE, PLAYER_PALETTE_SIZE,	// Palette + Length
+		PLAYER_PALETTE_BANK,					// Palette Bank
+		MEM_SPRITES,							// Where to put sprites.
+		3 << 5									// Size of sprites.
+												// https://github.com/alekmaul/pvsneslib/wiki/Sprites#sprite-sizes
+	);
+	oamSet(PLAYER_OAMID, player.rx, player.ry, 3, 0, 0, 0, 0);
+    oamSetEx(PLAYER_OAMID, OBJ_SMALL, 1);
+    oamSetVisible(PLAYER_OAMID, OBJ_SHOW);
+	
+	return player;
+}
+
+/*	void Player_Step();
 	Does all player-related duties when called.
 */
 void Player_Step(Player *player){
 	// Physics.
 	player->cx = player->cy = 0;
 	if(pad0){	// If a button has been pressed.
+		// Movement
 		if(pad0 & KEY_LEFT)
 			player->cx = -player->speed;
 		if(pad0 & KEY_RIGHT)
@@ -200,6 +213,9 @@ void Player_Step(Player *player){
 			player->cy = -player->speed;
 		if(pad0 & KEY_DOWN)
 			player->cy = player->speed;
+		
+		// Shooting
+		
 	}
 	
 	player->x += player->cx;
@@ -209,7 +225,7 @@ void Player_Step(Player *player){
 	player->ry = UFXToChar(player->y);
 	
 	// Update player OAM object.
-	oamSet(player->oamID, player->rx, player->ry, 3, player->hortFlip, 0, playerSpriteTable[player->curFrame + player->sprState], 0);
+	oamSet(PLAYER_OAMID, player->rx, player->ry, 3, player->hortFlip, 0, playerSpriteTable[player->curFrame + player->sprState], 0);
 }
 
 /*	TODO
