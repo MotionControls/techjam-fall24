@@ -21,6 +21,16 @@ extern char iconsmap, iconsmap_end;
 #define MEM_BACKGROUNDS		0x6000
 #define MEM_MAPS			0x0000
 
+// Player Stuffs
+#define PLAYER_OAM_ID		0
+#define PLAYER_HORT			16
+#define PLAYER_VERT			32
+
+// Bullet Stuffs
+#define BULLET_MAX_BULLETS	3
+#define BULLET_HORT			8
+#define BULLET_VERT			8
+
 // Sprite Tables
 // The way these tables work is that each value represents a point in memory from the OAM tileset.
 // Each value should point towards the top-left corner of a given sprite.
@@ -34,6 +44,7 @@ enum PlayerStates{	// TODO: Explain how these work in tandem with playerSpriteTa
 	PS_IDLE	= 0
 };
 
+// Any player related vars that aren't expected to change should be #defined.
 typedef struct{
 	// Position
 	u8 rx, ry;	// The on-screen position.
@@ -42,7 +53,6 @@ typedef struct{
 	ufx speed;	// How fast the player moves in any given direction. Unsigned fixed number.
 	
 	// Sprites
-	u8 oamID;
 	u8 curFrame;		// The index of the current frame from playerSpriteTable.
 	u8 sprState;		// The sprite state of the player. Values must be from PlayerStates
 	u8 frameTimer;		// The amount of time the current frame has lasted.
@@ -51,6 +61,20 @@ typedef struct{
 	u8 hortFlip;		// Whether or not to flip the player sprite horizontally.
 						// I don't suspect we'll need vertFlip but it's easy to add if we do.
 }Player;
+
+typedef struct{
+	// Position
+	// Same functions as in player.
+	u8 rx, ry;
+	ufx x, y;
+	sfx cx, cy;
+	ufx speed;
+	
+	// Sprites
+	u8 visible;
+	u8 hortFlip;
+	u8 vertFlip;
+}Bullet;
 
 // Init globals.
 u16 pad0, storePad0;	// pad0 = Current Input
@@ -68,7 +92,7 @@ int main(void){
 		0, 0,
 		CharToUFX(1, 0),
 		
-		0, 0, 0, 0, 0,
+		0, 0, 0, 0,
 		1,
 		0
 	};
