@@ -93,8 +93,11 @@ u16 pad0, storePad0;	// pad0 = Current Input
 
 // Function protos.
 u8 CheckCollision(Player player, u8* arr, u8 xStart, u8 xRange, u8 yStart, u8 yRange);
+
 Player Player_Init(u8 x, u8 y, ufx speed);
 void Player_Step(Player *player);
+
+void BG_Change(u8 index, u8* tiles, u16 tilesSize, u8* palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8* map, u16 mapSize, u16 mapMem);
 
 int main(void){
 	// Init SNES
@@ -105,18 +108,12 @@ int main(void){
 	Player player = Player_Init(100, 100, CharToUFX(1, 0));
 	
 	// Init BG stuffs.
-	bgInitTileSet(
+	BG_Change(
 		0,
-		&iconsbg, &iconspal, 0,
-		(&iconsbg_end - &iconsbg), (&iconspal_end - &iconspal),
-		BG_16COLORS,
-		MEM_BACKGROUNDS
-	);
-	
-	bgInitMapSet(
-		0,
+		&iconsbg, (&iconsbg_end - &iconsbg),
+		&iconspal, (&iconspal_end - &iconspal), 0,
+		MEM_BACKGROUNDS,
 		&iconsmap, (&iconsmap_end - &iconsmap),
-		SC_32x32,
 		MEM_MAPS
 	);
 	
@@ -129,26 +126,6 @@ int main(void){
 	// Activate Mode1 and set tile size to 8x8.
 	setMode(BG_MODE1, 0);
 
-	// Logo Loop.
-	// Show logos for ~3 seconds.
-	// Fade to black in ~1 second.
-	/*unsigned int frameCounter = 0;
-	while(frameCounter < 60 * 4){
-		// TODO
-		frameCounter++;
-		WaitForVBlank();
-	}
-	
-	// Main Menu Loop.
-	// Show main menu until pressed start.
-	// Fade to black in ~1 second.
-	u8 showMainMenu = 1;
-	while(showMainMenu){
-		// TODO
-		showMainMenu = 1;
-		WaitForVBlank();
-	}*/
-	
 	// Game Loop.
 	while (1){
 		// Poll input.
@@ -226,6 +203,24 @@ void Player_Step(Player *player){
 	
 	// Update player OAM object.
 	oamSet(PLAYER_OAMID, player->rx, player->ry, 3, player->hortFlip, 0, playerSpriteTable[player->curFrame + player->sprState], 0);
+}
+
+/*	void BG_Change(index, tiles, tilesSize, palette, paletteSize, paletteBank, tileMem, map, mapSize, mapMem);
+	Changes the background at index.
+index		;	Index of the background to change.
+tiles		;	Memory pointer of the tiles.
+tilesSize	;	Size of the tile memory.
+palette		;	Memory pointer of the palette.
+paletteSize	;	Size of the palette memory.
+paletteBank	;	Which palette bank to store the palette in.
+tileMem		;	Where to store the tiles in memory.
+map			;	Memory pointer of the map.
+mapSize		;	Size of the map memory.
+mapMem		;	Where to store the map in memory.
+*/
+void BG_Change(u8 index, u8* tiles, u16 tilesSize, u8* palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8* map, u16 mapSize, u16 mapMem){
+	bgInitTileSet(index, tiles, palette, paletteBank, tilesSize, paletteSize, BG_16COLORS, tileMem);
+	bgInitMapSet(index, map, mapSize, SC_32x32, mapMem);
 }
 
 /*	TODO
