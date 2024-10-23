@@ -22,14 +22,22 @@ extern char iconsmap, iconsmap_end;
 #define MEM_MAPS			0x0000
 
 // Player Stuffs
-#define PLAYER_OAM_ID		0
+#define PLAYER_OAM_ID		0	// This is ideally the ONLY OAM that should be const.
 #define PLAYER_HORT			16
 #define PLAYER_VERT			32
+#define PLAYER_SPRITES		&johnspr
+#define PLAYER_SPRITES_SIZE	(&johnspr_end - &johnspr)
+#define PLAYER_PALETTE		&johnpal
+#define PLAYER_PALETTE_SIZE	(&johnpal_end - &johnpal)
 
 // Bullet Stuffs
 #define BULLET_MAX_BULLETS	3
 #define BULLET_HORT			8
 #define BULLET_VERT			8
+#define BULLET_SPRITES		&johnspr
+#define BULLET_SPRITES_SIZE	(&johnspr_end - &johnspr)
+#define BULLET_PALETTE_SIZE	(&johnpal_end - &johnpal)	// The bullet palette cannot be const due to the colors of the bullet changing.
+														// The size of the palette SHOULD remain constant.
 
 // Sprite Tables
 // The way these tables work is that each value represents a point in memory from the OAM tileset.
@@ -71,9 +79,11 @@ typedef struct{
 	ufx speed;
 	
 	// Sprites
+	u8 oamID;
 	u8 visible;
 	u8 hortFlip;
 	u8 vertFlip;
+	u8* palette;
 }Bullet;
 
 // Init globals.
