@@ -1,5 +1,6 @@
 #include "object_funcs.h"
 #include <snes.h>
+#include "sprite_tables.h"
 
 u8 CheckCollision_obj_obj(s_objectData *objA, s_objectData *objB) {
     u8 collision_result = 0;
@@ -57,19 +58,27 @@ void player_tick(u16 pad0, s_objectData *player, Level* level) {
         // Movement
         if (pad0 & KEY_LEFT){
             player->pData.dX = -player->pData.speed;
+			player->aData.sprState = PS_SIDE;
+			player->sData.hFlip = 0;
 		}
         if (pad0 & KEY_RIGHT){
             player->pData.dX = player->pData.speed;
+			player->aData.sprState = PS_SIDE;
+			player->sData.hFlip = 1;
 		}
         if (pad0 & KEY_UP){
             player->pData.dY = -player->pData.speed;
+			player->aData.sprState = PS_UP;
 		}
         if (pad0 & KEY_DOWN){
 			player->pData.dY = player->pData.speed;
+			player->aData.sprState = PS_DOWN;
 		}
 
         // Shooting
         // BIG BIG TODO
+		
+		player->aData.frameTimer++;
     }
 
     player->pData.wX += player->pData.dX;
@@ -79,10 +88,21 @@ void player_tick(u16 pad0, s_objectData *player, Level* level) {
     player->pData.scrY = SFXToChar(player->pData.wY);
 	
 	// Animation
+	if(player->aData.frameTimer > player->aData.timePerFrame){
+		player->aData.frameTimer = 0;
+		
+		// Maybe make the max possible frame a var in aData?
+		player->aData.curFrame = (player->aData.curFrame == 2) ? 0 : player->aData.curFrame + 1;
+	}
 }
 
 void player_draw(s_objectData *player) {
-    generic_draw(player);
+    //generic_draw(player);
+	
+	// This is moved here due to needing playerSpriteTable.
+	// Alternativaley we could fit all sprites into a single sprite table and depend on sprState to point towards the right index.
+	oamSetVisible(player->sData.oamID, player->sData.visible ? OBJ_SHOW : OBJ_HIDE);
+    oamSet(player->sData.oamID, player->pData.scrX, player->pData.scrY, 3, player->sData.hFlip, player->sData.vFlip, playerSpriteTable[player->aData.curFrame + player->aData.sprState], 0);
 }
 
 void target_tick(u16 pad0, s_objectData *target, Level* level) {

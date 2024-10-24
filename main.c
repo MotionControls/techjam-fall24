@@ -54,23 +54,6 @@ extern char snesfont, snespal;
 // BG Stuffs
 #define BG_MAP_SIZE (&iconsmap_end - &iconsmap) // Given each background is 256x256, they should all very conveniently have the same map size.
 
-// Sprite Tables
-// The way these tables work is that each value represents a point in memory from the OAM tileset.
-// Each value should point towards the top-left corner of a given sprite.
-// The location of each sprite (after loading) can be easily seen through something like Mesen.
-const u8 playerSpriteTable[2] = {
-    0, // Where the data??? Can't find the data??? Whyre is the dtaa???
-    1
-};
-
-// Structs
-enum PlayerStates {
-    PS_DOWN = 0,
-	PS_UP = 1,
-	PS_LEFT = 2,
-	PS_RIGHT = 3
-};
-
 // Init globals.
 Level levels[1];     // Level Array
 u16 pad0, storePad0; // pad0 = Current Input
@@ -195,6 +178,12 @@ s_objectData Player_Init(u8 x, u8 y, ufx speed) {
     oamSet(player.sData.oamID, player.pData.scrX, player.pData.scrY, 3, 0, 0, 0, 0);
     oamSetEx(player.sData.oamID, OBJ_SMALL, 1);
     oamSetVisible(player.sData.oamID, OBJ_SHOW);
+	
+	// This should probably be modular but for now we'll hard code it.
+	player.aData.frameTimer = 0;
+	player.aData.curFrame = 0;
+	player.aData.sprState = 0;
+	player.aData.timePerFrame = 30;
 
     return player;
 }
