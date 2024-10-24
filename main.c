@@ -67,6 +67,8 @@ void add_obj_to_lvl(s_objectData obj, u8 *obj_id, Level *level);
 s_objectData Player_Init(u8 x, u8 y, ufx speed);
 s_objectData Target_Init(u8 x, u8 y, ufx speed);
 
+u8 level_obj_count;
+
 void BG_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8 *map, u16 mapSize, u16 mapMem);
 
 int main(void) {
@@ -118,17 +120,12 @@ int main(void) {
 }
 
 void Level_Tick(u16 pad0, Level *level) {
-    (*level->data->objects[0].update_ptr)(pad0, &level->data->objects[0], level);
-    (*level->data->objects[0].draw_ptr)(&level->data->objects[0]);
-
-    (*level->data->objects[1].update_ptr)(pad0, &level->data->objects[1], level);
-    (*level->data->objects[1].draw_ptr)(&level->data->objects[1]);
-    // for (u8 i = 0; i < level->data->numObj; i++) {
-    //     (*level->data->objects[i].update_ptr)(pad0, &level->data->objects[i]);
-    // }
-    // for (u8 i = 0; i < level->data->numObj; i++) {
-    //     (*level->data->objects[i].draw_ptr)(&level->data->objects[i]);
-    // }
+    u8 i = 0;
+    while(i < level_obj_count) {
+        (*level->data->objects[i].update_ptr)(pad0, &level->data->objects[i], level);
+        (*level->data->objects[i].draw_ptr)(&level->data->objects[i]);
+        ++i;
+    }
 }
 
 Level Level_Init(u8 id) {
@@ -147,13 +144,13 @@ Level Level_Init(u8 id) {
     loaded_level.data = malloc(sizeof(s_levelData));
     add_obj_to_lvl(Player_Init(loaded_level.xSpawn, loaded_level.ySpawn, CharToUFX(1, 0)), &curObjID, &loaded_level);
     add_obj_to_lvl(Target_Init(200, 150, CharToUFX(0, 0)), &curObjID, &loaded_level);
+    level_obj_count = curObjID;
     return loaded_level;
 }
 
 void add_obj_to_lvl(s_objectData obj, u8 *obj_id, Level *level) {
     level->data->objects[*obj_id] = obj;
     (*obj_id)++;
-    level->data->numObj++;
 }
 
 // Functions
