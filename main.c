@@ -60,11 +60,15 @@ extern char snesfont, snespal;
 // The location of each sprite (after loading) can be easily seen through something like Mesen.
 const u8 playerSpriteTable[2] = {
     0, // Where the data??? Can't find the data??? Whyre is the dtaa???
-    1};
+    1
+};
 
 // Structs
-enum PlayerStates { // TODO: Explain how these work in tandem with playerSpriteTable.
-    PS_IDLE = 0
+enum PlayerStates {
+    PS_DOWN = 0,
+	PS_UP = 1,
+	PS_LEFT = 2,
+	PS_RIGHT = 3
 };
 
 // Init globals.

@@ -55,14 +55,18 @@ void player_tick(u16 pad0, s_objectData *player, Level* level) {
     player->pData.dX = player->pData.dY = 0;
     if (pad0) { // If a button has been pressed.
         // Movement
-        if (pad0 & KEY_LEFT)
+        if (pad0 & KEY_LEFT){
             player->pData.dX = -player->pData.speed;
-        if (pad0 & KEY_RIGHT)
+		}
+        if (pad0 & KEY_RIGHT){
             player->pData.dX = player->pData.speed;
-        if (pad0 & KEY_UP)
+		}
+        if (pad0 & KEY_UP){
             player->pData.dY = -player->pData.speed;
-        if (pad0 & KEY_DOWN)
-            player->pData.dY = player->pData.speed;
+		}
+        if (pad0 & KEY_DOWN){
+			player->pData.dY = player->pData.speed;
+		}
 
         // Shooting
         // BIG BIG TODO
@@ -73,6 +77,8 @@ void player_tick(u16 pad0, s_objectData *player, Level* level) {
 
     player->pData.scrX = SFXToChar(player->pData.wX);
     player->pData.scrY = SFXToChar(player->pData.wY);
+	
+	// Animation
 }
 
 void player_draw(s_objectData *player) {

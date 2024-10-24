@@ -6,11 +6,13 @@
 ; Sprites ;
 ;;;;;;;;;;;
 johnspr:
-.incbin "res/johnplaceholder.pic"
+;.incbin "res/johnplaceholder.pic"
+.incbin "res/johnplaceholder2.pic"
 johnspr_end:
 
 johnpal:
-.incbin "res/johnplaceholder.pal"
+;.incbin "res/johnplaceholder.pal"
+.incbin "res/johnplaceholder2.pal"
 johnpal_end:
 
 ;;;;;;;;;;;;;;;

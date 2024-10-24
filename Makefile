@@ -20,7 +20,7 @@ clean: cleanBuildRes cleanRom cleanGfx
 #---------------------------------------------------------------------------------
 # https://github.com/alekmaul/pvsneslib/tree/master/tools/gfx4snes
 # SPRITES
-john.pic: res/johnplaceholder.bmp
+john.pic: res/johnplaceholder2.bmp
 	@echo convert bitmap ... $(notdir $@)
 	$(GFXCONV) -s 32 -o 16 -u 16 -t bmp -i $<
 
