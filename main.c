@@ -54,10 +54,6 @@ extern char snesfont, snespal;
 // BG Stuffs
 #define BG_MAP_SIZE (&iconsmap_end - &iconsmap) // Given each background is 256x256, they should all very conveniently have the same map size.
 
-// Level Stuffs
-#define LEVEL_TILE_SIZE 16
-#define LEVEL_MAX_TARGETS 8
-
 // Sprite Tables
 // The way these tables work is that each value represents a point in memory from the OAM tileset.
 // Each value should point towards the top-left corner of a given sprite.
@@ -71,27 +67,18 @@ enum PlayerStates { // TODO: Explain how these work in tandem with playerSpriteT
     PS_IDLE = 0
 };
 
-typedef struct {
-    u8 *tiles, *palette, *map;                       // BG Data
-    u16 tilesSize, paletteSize, mapSize;             // BG Data Sizes
-    u8 xSpawn, ySpawn;                               // Player's Spawn Position
-    u8 collision[LEVEL_TILE_SIZE * LEVEL_TILE_SIZE]; // Collision Array
-    Target targets[LEVEL_MAX_TARGETS];               // Target Array
-} Level;
-
 // Init globals.
 Level levels[1];     // Level Array
 u16 pad0, storePad0; // pad0 = Current Input
                      // storePad0 = Last Frame's Input
+Level cur_level;
 
-// Function protos.
-u8 CheckCollision(Player player, u8 *arr, u8 xStart, u8 xRange, u8 yStart, u8 yRange);
+Level Level_Init(u8 id);
+void Level_Tick(u16 pad0, Level *level);
+void add_obj_to_lvl(s_objectData obj, u8 *obj_id, Level *level);
 
-Player Player_Init(u8 x, u8 y, ufx speed);
-void Player_Step(Player *player);
-
-Target Target_Init(u8 x, u8 y, ufx speed);
-void Target_Step(Target *target, Player *player);
+s_objectData Player_Init(u8 x, u8 y, ufx speed);
+s_objectData Target_Init(u8 x, u8 y, ufx speed);
 
 void BG_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8 *map, u16 mapSize, u16 mapMem);
 
@@ -105,8 +92,9 @@ int main(void) {
 
     // Init player.
     // The OAM can only be used AFTER consoleInit so this should be done afterwards.
-    Player player = Player_Init(100, 100, CharToUFX(1, 0));
-    Target target = Target_Init(100, 100, CharToUFX(0, 0));
+    //    s_objectData player = Player_Init(100, 100, CharToUFX(1, 0));
+    //    s_objectData target = Target_Init(100, 100, CharToUFX(0, 0));
+    cur_level = Level_Init(0);
 
     //Init BG stuffs.
     BG_Change(
@@ -135,13 +123,50 @@ int main(void) {
         storePad0 = pad0;
         pad0 = padsCurrent(0);
 
-        // Step OAM objects.
-        Player_Step(&player);
-        Target_Step(&target, &player);
+        Level_Tick(pad0, &cur_level);
 
         WaitForVBlank();
     }
     return 0;
+}
+
+void Level_Tick(u16 pad0, Level *level) {
+    (*level->data->objects[0].update_ptr)(pad0, &level->data->objects[0], level);
+    (*level->data->objects[0].draw_ptr)(&level->data->objects[0]);
+
+    (*level->data->objects[1].update_ptr)(pad0, &level->data->objects[1], level);
+    (*level->data->objects[1].draw_ptr)(&level->data->objects[1]);
+    // for (u8 i = 0; i < level->data->numObj; i++) {
+    //     (*level->data->objects[i].update_ptr)(pad0, &level->data->objects[i]);
+    // }
+    // for (u8 i = 0; i < level->data->numObj; i++) {
+    //     (*level->data->objects[i].draw_ptr)(&level->data->objects[i]);
+    // }
+}
+
+Level Level_Init(u8 id) {
+    u8 curObjID = 0;
+    Level loaded_level = {
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        100,
+        100
+    };
+
+    loaded_level.data = malloc(sizeof(s_levelData));
+    add_obj_to_lvl(Player_Init(loaded_level.xSpawn, loaded_level.ySpawn, CharToUFX(1, 0)), &curObjID, &loaded_level);
+    add_obj_to_lvl(Target_Init(200, 150, CharToUFX(0, 0)), &curObjID, &loaded_level);
+    return loaded_level;
+}
+
+void add_obj_to_lvl(s_objectData obj, u8 *obj_id, Level *level) {
+    level->data->objects[*obj_id] = obj;
+    (*obj_id)++;
+    level->data->numObj++;
 }
 
 // Functions
@@ -150,36 +175,22 @@ int main(void) {
 x, y	;	Starting position.
 speed	;	Starting speed.
 */
-Player Player_Init(u8 x, u8 y, ufx speed) {
+s_objectData Player_Init(u8 x, u8 y, ufx speed) {
     // Init player.
-    Player player = {
-        {
-            x, y,
-            CharToSFX(x, 0), CharToSFX(y, 0),
-            0, 0,
-            speed,
-            0, 8,
-            16, 32,
-        },
-        0,
-        0,
-        0,
-        0,
-        1,
-        0};
+    s_objectData player = generic_init_obj(x, y, speed, PLAYER_OAMID, PLAYER_PALETTE, &player_tick, &player_draw);
 
     // Init OAM object.
     oamInitGfxSet(
-        PLAYER_SPRITES, PLAYER_SPRITES_SIZE, // Sprites + Length
-        PLAYER_PALETTE, PLAYER_PALETTE_SIZE, // Palette + Length
-        PLAYER_PALETTE_BANK,                 // Palette Bank
-        MEM_SPRITES,                         // Where to put sprites.
-        SPR_SIZE_16x32                       // Size of sprites.
+        PLAYER_SPRITES, PLAYER_SPRITES_SIZE,       // Sprites + Length
+        player.sData.palette, PLAYER_PALETTE_SIZE, // Palette + Length
+        PLAYER_PALETTE_BANK,                       // Palette Bank
+        MEM_SPRITES,                               // Where to put sprites.
+        SPR_SIZE_16x32                             // Size of sprites.
         );
 
-    oamSet(PLAYER_OAMID, player.data.scrX, player.data.scrY, 3, 0, 0, 0, 0);
-    oamSetEx(PLAYER_OAMID, OBJ_SMALL, 1);
-    oamSetVisible(PLAYER_OAMID, OBJ_SHOW);
+    oamSet(player.sData.oamID, player.pData.scrX, player.pData.scrY, 3, 0, 0, 0, 0);
+    oamSetEx(player.sData.oamID, OBJ_SMALL, 1);
+    oamSetVisible(player.sData.oamID, OBJ_SHOW);
 
     return player;
 }
@@ -190,102 +201,24 @@ Player Player_Init(u8 x, u8 y, ufx speed) {
 x, y	;	Starting position.
 speed	;	Starting speed.
 */
-Target Target_Init(u8 x, u8 y, ufx speed) {
-    // Init player.
-    Target target = {
-        {
-            x, y,
-            CharToSFX(x, 0), CharToSFX(y, 0),
-            0, 0,
-            speed,
-            0, 8,
-            16, 32,
-        },
-        4,
-        1,
-        0,
-        0,
-        NULL};
+s_objectData Target_Init(u8 x, u8 y, ufx speed) {
+    // Init target.
+    s_objectData target = generic_init_obj(x, y, speed, 4, PLAYER_PALETTE, &target_tick, &target_draw);
 
     // Init OAM object.
     oamInitGfxSet(
-        PLAYER_SPRITES, PLAYER_SPRITES_SIZE, // Sprites + Length
-        PLAYER_PALETTE, PLAYER_PALETTE_SIZE, // Palette + Length
-        PLAYER_PALETTE_BANK,                 // Palette Bank
-        MEM_SPRITES,                         // Where to put sprites.
-        SPR_SIZE_16x32                       // Size of sprites.
+        PLAYER_SPRITES, PLAYER_SPRITES_SIZE,       // Sprites + Length
+        target.sData.palette, PLAYER_PALETTE_SIZE, // Palette + Length
+        PLAYER_PALETTE_BANK,                       // Palette Bank
+        MEM_SPRITES,                               // Where to put sprites.
+        SPR_SIZE_16x32                             // Size of sprites.
         );
 
-    oamSet(target.oamID, target.data.scrX, target.data.scrY, 3, 0, 0, 0, 0);
-    oamSetEx(target.oamID, OBJ_SMALL, 1);
-    oamSetVisible(target.oamID, OBJ_SHOW);
+    oamSet(target.sData.oamID, target.pData.scrX, target.pData.scrY, 3, 0, 0, 0, 0);
+    oamSetEx(target.sData.oamID, OBJ_SMALL, 1);
+    oamSetVisible(target.sData.oamID, OBJ_SHOW);
 
     return target;
-}
-
-/*	void Player_Step();
-	Does all player-related duties when called.
-*/
-void Player_Step(Player *player) {
-    // Physics.
-    player->data.dX = player->data.dY = 0;
-    if (pad0) { // If a button has been pressed.
-        // Movement
-        if (pad0 & KEY_LEFT)
-            player->data.dX = -player->data.speed;
-        if (pad0 & KEY_RIGHT)
-            player->data.dX = player->data.speed;
-        if (pad0 & KEY_UP)
-            player->data.dY = -player->data.speed;
-        if (pad0 & KEY_DOWN)
-            player->data.dY = player->data.speed;
-
-        // Shooting
-        // BIG BIG TODO
-    }
-
-    player->data.wX += player->data.dX;
-    player->data.wY += player->data.dY;
-
-    player->data.scrX = SFXToChar(player->data.wX);
-    player->data.scrY = SFXToChar(player->data.wY);
-
-    // Update player OAM object.
-    oamSet(PLAYER_OAMID, player->data.scrX, player->data.scrY, 3, player->hortFlip, 0, playerSpriteTable[player->curFrame + player->sprState], 0);
-}
-
-void Target_Step(Target *target, Player *player) {
-    // Physics.
-    target->data.dX = target->data.dY = 100;
-    //	if(pad0){	// If a button has been pressed.
-    //		// Movement
-    //		if(pad0 & KEY_LEFT)
-    //			player->data.dX = -player->data.speed;
-    //		if(pad0 & KEY_RIGHT)
-    //			player->data.dX = player->data.speed;
-    //		if(pad0 & KEY_UP)
-    //			player->data.dY = -player->data.speed;
-    //		if(pad0 & KEY_DOWN)
-    //			player->data.dY = player->data.speed;
-    //
-    //		// Shooting
-    //		// BIG BIG TODO
-    //	}
-
-    target->data.wX += target->data.dX;
-    target->data.wY += target->data.dY;
-
-    target->data.scrX = SFXToChar(target->data.wX);
-    target->data.scrY = SFXToChar(target->data.wY);
-
-    target->visible = CheckCollision_obj_obj(&target->data, &player->data);
-
-    //    consoleDrawText(10, 10, "%u", target->visible);
-
-    oamSetVisible(target->oamID, target->visible ? OBJ_SHOW : OBJ_HIDE);
-
-    // Update player OAM object.
-    oamSet(target->oamID, target->data.scrX, target->data.scrY, 3, target->hortFlip, 0, playerSpriteTable[target->visible], 0);
 }
 
 /*	void BG_Change(index, tiles, tilesSize, palette, paletteSize, paletteBank, tileMem, map, mapSize, mapMem);
@@ -305,12 +238,3 @@ void BG_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize,
     bgInitTileSet(index, tiles, palette, paletteBank, tilesSize, paletteSize, BG_16COLORS, tileMem);
     bgInitMapSet(index, map, mapSize, SC_32x32, mapMem);
 }
-
-/*	TODO
-	Returns 1 if collision, 0 otherwise.
-player			;	...
-arr				;	1D level array.
-xStart, yStart	;	What part of the array to start the sweep at.
-xRange, yRange	;	How much of the array to sweep.
-*/
-u8 CheckCollision(Player player, u8 *arr, u8 xStart, u8 xRange, u8 yStart, u8 yRange) {}

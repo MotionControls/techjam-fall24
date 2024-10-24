@@ -6,5 +6,8 @@
 *.obj
 linkfile
 
+# Ignore generated debug files
+*.dbg
+
 # Ignore Metype's weird IDE config files
 .fleet
