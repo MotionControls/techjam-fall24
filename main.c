@@ -2,6 +2,7 @@
 
 #include <snes.h>
 #include "fp_math.h"
+#include "objects.h"
 
 // Sprites
 extern char johnspr, johnspr_end;
@@ -63,60 +64,9 @@ const u8 playerSpriteTable[1] = {
 };
 
 // Structs
-enum PlayerStates{	// TODO: Explain how these work in tandem with playerSpriteTable.
+enum PlayerStates {	// TODO: Explain how these work in tandem with playerSpriteTable.
 	PS_IDLE	= 0
 };
-
-// Any player related vars that aren't expected to change should be #defined.
-typedef struct{
-	// Position
-	u8 rx, ry;	// The on-screen position.
-	ufx x, y;	// The real position. Unsigned fixed number.
-	sfx cx, cy;	// The change in position. Signed fixed number.
-	ufx speed;	// How fast the player moves in any given direction. Unsigned fixed number.
-	
-	// Sprites
-	u8 curFrame;		// The index of the current frame from playerSpriteTable.
-	u8 sprState;		// The sprite state of the player. Values must be from PlayerStates.
-	u8 frameTimer;		// The amount of time the current frame has lasted.
-	u8 timePerFrame;	// The max amount of time each frame can last.
-	u8 visible;			// Whether or not sprite is visible.
-	u8 hortFlip;		// Whether or not to flip the player sprite horizontally.
-						// I don't suspect we'll need vertFlip but it's easy to add if we do.
-}Player;
-
-typedef struct{
-	// Position
-	// Same functions as in player.
-	u8 rx, ry;
-	ufx x, y;
-	sfx cx, cy;
-	ufx speed;
-	
-	// Sprites
-	u8 oamID;
-	u8 visible;
-	u8 hortFlip;
-	u8 vertFlip;
-	u8* palette;
-}Bullet;
-
-// This may not be needed? If they share the same variables then I don't see a reason to not reuse Bullet as Target.
-typedef struct{
-	// Position
-	// Same functions as in player.
-	u8 rx, ry;
-	ufx x, y;
-	sfx cx, cy;
-	ufx speed;
-	
-	// Sprites
-	u8 oamID;
-	u8 visible;
-	u8 hortFlip;
-	u8 vertFlip;
-	u8* palette;
-}Target;
 
 typedef struct{
 	u8 *tiles, *palette, *map;							// BG Data
@@ -124,7 +74,7 @@ typedef struct{
 	u8 xSpawn, ySpawn;									// Player's Spawn Position
 	u8 collision[LEVEL_TILE_SIZE * LEVEL_TILE_SIZE];	// Collision Array
 	Target targets[LEVEL_MAX_TARGETS];					// Target Array
-}Level;
+} Level;
 
 // Init globals.
 Level levels[1];		// Level Array
@@ -189,10 +139,14 @@ speed	;	Starting speed.
 Player Player_Init(u8 x, u8 y, ufx speed){
 	// Init player.
 	Player player = {
-		x, y,
-		CharToUFX(x, 0), CharToUFX(y, 0),
-		0, 0,
-		speed,
+		  {
+			  x, y,
+			  CharToUFX(x, 0), CharToUFX(y, 0),
+			  0, 0,
+			  speed,
+  				-8, -16,
+  				16, 32,
+		  },
 		0,0,0,0,
 		1,
 		0
@@ -206,7 +160,8 @@ Player Player_Init(u8 x, u8 y, ufx speed){
 		MEM_SPRITES,							// Where to put sprites.
 		SPR_SIZE_16x32							// Size of sprites.
 	);
-	oamSet(PLAYER_OAMID, player.rx, player.ry, 3, 0, 0, 0, 0);
+
+	oamSet(PLAYER_OAMID, player.data.scrX, player.data.scrY, 3, 0, 0, 0, 0);
     oamSetEx(PLAYER_OAMID, OBJ_SMALL, 1);
     oamSetVisible(PLAYER_OAMID, OBJ_SHOW);
 	
@@ -218,30 +173,30 @@ Player Player_Init(u8 x, u8 y, ufx speed){
 */
 void Player_Step(Player *player){
 	// Physics.
-	player->cx = player->cy = 0;
+	player->data.dX = player->data.dY = 0;
 	if(pad0){	// If a button has been pressed.
 		// Movement
 		if(pad0 & KEY_LEFT)
-			player->cx = -player->speed;
+			player->data.dX = -player->data.speed;
 		if(pad0 & KEY_RIGHT)
-			player->cx = player->speed;
+			player->data.dX = player->data.speed;
 		if(pad0 & KEY_UP)
-			player->cy = -player->speed;
+			player->data.dY = -player->data.speed;
 		if(pad0 & KEY_DOWN)
-			player->cy = player->speed;
+			player->data.dY = player->data.speed;
 		
 		// Shooting
 		// BIG BIG TODO
 	}
 	
-	player->x += player->cx;
-	player->y += player->cy;
+	player->data.wX += player->data.dX;
+	player->data.wY += player->data.dY;
 	
-	player->rx = UFXToChar(player->x);
-	player->ry = UFXToChar(player->y);
+	player->data.scrX = UFXToChar(player->data.wX);
+	player->data.scrY = UFXToChar(player->data.wY);
 	
 	// Update player OAM object.
-	oamSet(PLAYER_OAMID, player->rx, player->ry, 3, player->hortFlip, 0, playerSpriteTable[player->curFrame + player->sprState], 0);
+	oamSet(PLAYER_OAMID, player->data.scrX, player->data.scrY, 3, player->hortFlip, 0, playerSpriteTable[player->curFrame + player->sprState], 0);
 }
 
 /*	void BG_Change(index, tiles, tilesSize, palette, paletteSize, paletteBank, tileMem, map, mapSize, mapMem);
