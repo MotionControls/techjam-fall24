@@ -29,6 +29,26 @@ u8 CheckCollision_obj_obj(s_objectData *objA, s_objectData *objB) {
     return collision_result;
 }
 
+u8 CheckCollision_obj_level(s_objectData *objA, Level* level) {
+    u8 collision_result = 0;
+    u8 objALeft = UFXToChar(UFXAdd(objA->pData.wX, objA->pData.hitBoxOffsetX));
+    u8 objATop = UFXToChar(UFXAdd(objA->pData.wY, objA->pData.hitBoxOffsetY));
+    u8 objARight = objALeft + objA->pData.hitBoxSizeX;
+    u8 objABottom = objATop + objA->pData.hitBoxSizeY;
+
+    objA->pData.t = objATop;
+    objA->pData.b = objABottom;
+    objA->pData.l = objALeft;
+    objA->pData.r = objARight;
+
+    
+
+    // if (objALeft < objBRight && objARight > objBLeft && objATop < objBBottom && objABottom > objBTop) {
+    //     collision_result |= 1;
+    // }
+    return collision_result;
+}
+
 s_objectData generic_init_obj(u8 x, u8 y, ufx speed, u8 oamID, u8* palette, void (*update_ptr)(u16, struct s_objectData *), void (*draw_ptr)(struct s_objectData *))
 {
     s_objectData obj = {
@@ -104,6 +124,8 @@ void target_draw(s_objectData *target) {
 void generic_draw(s_objectData *object) {
     oamSetVisible(object->sData.oamID, object->sData.visible ? OBJ_SHOW : OBJ_HIDE);
 
+    if(!object->sData.visible) return;
+
     // Update player OAM object.
-    oamSet(object->sData.oamID, object->pData.scrX, object->pData.scrY, 3, object->sData.visible, 0, 0, 0);
+    oamSet(object->sData.oamID, object->pData.scrX, object->pData.scrY, 3, object->sData.hFlip, object->sData.vFlip, 0, 0);
 }
