@@ -28,4 +28,14 @@ iconsmap:
 .incbin "res/bg_icons.map"
 iconsmap_end:
 
+;;;;;;;;;
+; Fonts ;
+;;;;;;;;;
+
+snesfont:
+.incbin "res/pvsneslibfont.pic"
+
+snespal:
+.incbin "res/pvsneslibfont.pal"
+
 .ends

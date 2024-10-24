@@ -5,3 +5,6 @@
 *.sym
 *.obj
 linkfile
+
+# Ignore Metype's weird IDE config files
+.fleet
