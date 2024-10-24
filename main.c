@@ -159,6 +159,12 @@ Level Level_Init(u8 id) {
     };
 
     loaded_level.data = malloc(sizeof(s_levelData));
+    u16 i;
+    while(i < LEVEL_TILE_SIZE * LEVEL_TILE_SIZE) {
+        // 230/256 chance of a 0 (empty)
+        loaded_level.data->collision[i] = rand() > 230 ? 1 : 0;
+        ++i;
+    }
     add_obj_to_lvl(Player_Init(loaded_level.xSpawn, loaded_level.ySpawn, CharToUFX(1, 0)), &curObjID, &loaded_level);
     add_obj_to_lvl(Target_Init(200, 150, CharToUFX(0, 0)), &curObjID, &loaded_level);
     level_obj_count = curObjID;

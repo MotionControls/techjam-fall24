@@ -3,6 +3,7 @@
 #include "objects.h"
 
 u8 CheckCollision_obj_obj(s_objectData *objA, s_objectData *objB);
+u8 CheckCollision_obj_level(s_objectData *objA, Level* level);
 
 s_objectData generic_init_obj(
     u8 x, u8 y, 
