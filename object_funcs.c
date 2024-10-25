@@ -186,6 +186,25 @@ void generic_draw(s_objectData *object) {
     oamSet(object->sData.oamID, object->pData.scrX, object->pData.scrY, 3, object->sData.hFlip, object->sData.vFlip, 0, 0);
 }
 
-void generic_copy_data_to_sneslib_obj(s_objectData *object) {
-    // object->oData
+/*	void generic_copy_data_to_sneslib_obj(sobj, tobj);
+	Copies relevant fields from sobj to tobj.
+	https://alekmaul.github.io/pvsneslib/structt__objs.html
+sobj	;	Generic Data Object
+tobj	;	sneslib Data Object
+*/
+void generic_copy_data_to_sneslib_obj(s_objectData *sobj, t_objs *tobj) {
+    //tobj->action = sobj->aData.sprState;		// This may be a stretch to include?
+	//tobj->sprflip = sobj->sData.hFlip;		// Also may be a stretch? Not sure how sprflip is supposed to be used.
+	//tobj->sprid3216 = sobj->sData.oamID;		// This isn't supposed to be the OAM ID?
+	//tobj->sprpal = sobj->sData.palette;		// This isn't a pointer, so may just be asking for the palette bank index?
+	//tobj->tempo = ???;						// What the fuck is tempo?
+	//tobj->xofs = sobj->pData.hitBoxOffsetX;	// May be a stretch?
+	//tobj->yofs = sobj->pData.hitBoxOffsetY;
+	
+	tobj->height = sobj->pData.hitBoxSizeY;
+	tobj->width = sobj->pData.hitBoxSizeX;
+	tobj->sprframe = sobj->aData.curFrame;
+	tobj->sprnum = sobj->sData.oamID;
+	tobj->xpos = SFXToChar(sobj->pData.wX);
+	tobj->ypos = SFXToChar(sobj->pData.wY);
 }
