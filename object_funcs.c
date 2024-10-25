@@ -42,11 +42,46 @@ u8 CheckCollision_obj_level(s_objectData *objA, Level* level) {
     objA->pData.l = objALeft;
     objA->pData.r = objARight;
 
-    
+    // this is so so so bad lmao
+    // im just like... not functioning in the brain rn
+    u16 i = (objALeft / 8) + LEVEL_TILE_SIZE * (objATop / 8);
+    while(i < LEVEL_TILE_SIZE * LEVEL_TILE_SIZE) {
+        if(level->data->collision[i] == 0) {
+            ++i;
+            continue;
+        }
+        ++i;
 
-    // if (objALeft < objBRight && objARight > objBLeft && objATop < objBBottom && objABottom > objBTop) {
-    //     collision_result |= 1;
-    // }
+        u8 x = i % LEVEL_TILE_SIZE;
+        u8 y = i / LEVEL_TILE_SIZE;
+        u8 tileLeft = x * 16;
+        u8 tileTop = y * 16;
+        u8 tileRight = tileLeft + 16;
+        u8 tileBottom = tileTop + 16;
+
+        if (objALeft < tileRight && objARight > tileLeft && objATop < tileBottom && objABottom > tileTop) {
+            if(y < objATop) {
+                collision_result |= COLLISION_UP;
+                continue;
+            }
+            if(y > objABottom) {
+                collision_result |= COLLISION_DOWN;
+                continue;
+            }
+            if(x < objALeft) {
+                collision_result |= COLLISION_LEFT;
+                continue;
+            }
+            if(x > objARight) {
+                collision_result |= COLLISION_RIGHT;
+                continue;
+            }
+        }
+
+        if(tileTop > objABottom && tileLeft > objARight) break;
+    }
+
+    
     return collision_result;
 }
 
@@ -74,23 +109,24 @@ s_objectData generic_init_obj(u8 x, u8 y, ufx speed, u8 oamID, u8* palette, void
 void player_tick(u16 pad0, s_objectData *player, Level* level) {
     // Physics.
     player->pData.dX = player->pData.dY = 0;
+    u8 collision_result = CheckCollision_obj_level(player, level);
     if (pad0) { // If a button has been pressed.
         // Movement
-        if (pad0 & KEY_LEFT){
+        if (pad0 & KEY_LEFT && !(collision_result & COLLISION_LEFT)){
             player->pData.dX = -player->pData.speed;
 			player->aData.sprState = PS_SIDE;
 			player->sData.hFlip = 0;
 		}
-        if (pad0 & KEY_RIGHT){
+        if (pad0 & KEY_RIGHT && !(collision_result & COLLISION_RIGHT)){
             player->pData.dX = player->pData.speed;
 			player->aData.sprState = PS_SIDE;
 			player->sData.hFlip = 1;
 		}
-        if (pad0 & KEY_UP){
+        if (pad0 & KEY_UP && !(collision_result & COLLISION_UP)){
             player->pData.dY = -player->pData.speed;
 			player->aData.sprState = PS_UP;
 		}
-        if (pad0 & KEY_DOWN){
+        if (pad0 & KEY_DOWN && !(collision_result & COLLISION_DOWN)){
 			player->pData.dY = player->pData.speed;
 			player->aData.sprState = PS_DOWN;
 		}

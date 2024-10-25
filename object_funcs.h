@@ -2,6 +2,13 @@
 #define OBJECT_FUNCS_H
 #include "objects.h"
 
+enum COLLISION_RESULT_DIR {
+    COLLISION_UP =    0b1000,
+    COLLISION_DOWN =  0b0100,
+    COLLISION_LEFT =  0b0010,
+    COLLISION_RIGHT = 0b0001
+};
+
 u8 CheckCollision_obj_obj(s_objectData *objA, s_objectData *objB);
 u8 CheckCollision_obj_level(s_objectData *objA, Level* level);
 
