@@ -185,3 +185,7 @@ void generic_draw(s_objectData *object) {
     // Update player OAM object.
     oamSet(object->sData.oamID, object->pData.scrX, object->pData.scrY, 3, object->sData.hFlip, object->sData.vFlip, 0, 0);
 }
+
+void generic_copy_data_to_sneslib_obj(s_objectData *object) {
+    // object->oData
+}

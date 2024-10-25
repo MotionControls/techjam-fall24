@@ -23,5 +23,6 @@ void player_tick(u16, s_objectData *, Level*);
 void player_draw(s_objectData *);
 void target_tick(u16, s_objectData *, Level*);
 void target_draw(s_objectData *);
+void generic_copy_data_to_sneslib_obj(s_objectData *);
 void generic_draw(s_objectData *);
 #endif

@@ -13,6 +13,9 @@ extern char iconsbg, iconsbg_end;
 extern char iconspal, iconspal_end;
 extern char iconsmap, iconsmap_end;
 
+extern char tileset, tileset_end, tileset_pal;
+extern char map_testlvl, map_tilesetatt, map_tilesetdef;
+
 extern char snesfont, snespal;
 
 // Screen Stuffs
@@ -73,7 +76,7 @@ void BG_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize,
 
 int main(void) {
     // Init SNES
-    consoleInit();
+    // consoleInit();
     //    consoleSetTextVramBGAdr(MEM_CONSOLE);
     //    consoleSetTextVramAdr(0x3000);
     //    consoleSetTextOffset(0x0100);
@@ -94,16 +97,36 @@ int main(void) {
         &iconsmap, BG_MAP_SIZE,
         MEM_MAPS);
 
-    // This needs to be done after ANY new backgrounds are loaded.
-    // All accessible backgrounds are enabled by default.
+    // bgInitTileSet(0, &tileset, &tileset_pal, 0, (&tileset_end - &tileset), 16 * 2 * 3, BG_16COLORS, 0x2000);
+    // bgSetMapPtr(0, 0x6800, SC_64x32);
+
+    // // This needs to be done after ANY new backgrounds are loaded.
+    // // All accessible backgrounds are enabled by default.
     bgSetDisable(1);
     bgSetDisable(2);
 
     setScreenOn();
 
+    // mapLoad((u8 *)&map_testlvl, (u8 *)&map_tilesetdef, (u8 *)&map_tilesetatt);
 
-    // Activate Mode1 and set tile size to 8x8.
+
+    // // Activate Mode1 and set tile size to 8x8.
     setMode(BG_MODE1, 0);
+    // // setMode(BG_MODE1, 1);
+
+    // bgInitTileSet(0, &tileset, &tileset_pal, 0, (&tileset_end - &tileset), 16 * 2 * 3, BG_16COLORS, 0x2000);
+    // bgSetMapPtr(0, 0x6800, SC_64x32);
+
+    // // Now Put in 16 color mode and disable Bgs except current
+    // setMode(BG_MODE1, 0);
+    // bgSetDisable(1);
+    // bgSetDisable(2);
+
+    // // Screen activated
+    // setScreenOn();
+
+    // // Load map in memory and update it regarding current location of the sprite
+    // mapLoad((u8 *)&map_testlvl, (u8 *)&map_tilesetdef, (u8 *)&map_tilesetatt);
 
 
     // Game Loop.
@@ -112,9 +135,13 @@ int main(void) {
         storePad0 = pad0;
         pad0 = padsCurrent(0);
 
+        // mapUpdate();
+        // mapUpdateCamera(0, 0);
+
         Level_Tick(pad0, &cur_level);
 
         WaitForVBlank();
+        // mapVblank();
     }
     return 0;
 }

@@ -30,6 +30,26 @@ iconsmap:
 .incbin "res/bg_icons.map"
 iconsmap_end:
 
+tileset:
+.incbin "res/tileset.pic"
+tileset_end:
+
+tileset_pal:
+.incbin "res/tileset.pal"
+
+;;;;;;;;
+; Maps ;
+;;;;;;;;
+
+map_testlvl:
+.incbin "res/BG1.m16"
+
+map_tilesetatt:
+.incbin "res/test_lvl1.b16"
+
+map_tilesetdef:
+.incbin "res/test_lvl1.t16"
+
 ;;;;;;;;;
 ; Fonts ;
 ;;;;;;;;;
