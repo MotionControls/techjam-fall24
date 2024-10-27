@@ -73,6 +73,7 @@ s_objectData Target_Init(u8 x, u8 y, ufx speed);
 u8 level_obj_count;
 
 void BG_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8 *map, u16 mapSize, u16 mapMem);
+void TLD_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8* tldMap, u8* tldTiles, u8* tldProps, u8 tileSize);
 
 int main(void) {
     // Init SNES
@@ -141,7 +142,7 @@ int main(void) {
         Level_Tick(pad0, &cur_level);
 
         WaitForVBlank();
-        // mapVblank();
+        mapVblank();
     }
     return 0;
 }
@@ -260,4 +261,18 @@ mapMem		;	Where to store the map in memory.
 void BG_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8 *map, u16 mapSize, u16 mapMem) {
     bgInitTileSet(index, tiles, palette, paletteBank, tilesSize, paletteSize, BG_16COLORS, tileMem);
     bgInitMapSet(index, map, mapSize, SC_32x32, mapMem);
+}
+
+/*	void TLD_Change(index, tiles, tilesSize, palette, paletteSize, paletteBank, tileMem, tldMap, tldTiles, tildProps, tileSize);
+	Changes the background at index, using the PV's MAP engine.
+...			;	Shared with BG_Change().
+tldMap		;	TILED map data.
+tldTiles	;	TILED tile data.
+tldProps	;	TILED tile property data.
+tileSize	;	Size of the map in 8x8 tiles.
+*/
+void TLD_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8* tldMap, u8* tldTiles, u8* tldProps, u8 tileSize){
+	bgInitTileSet(index, tiles, palette, paletteBank, tilesSize, paletteSize, BG_16COLORS, tileMem);
+    bgSetMapPtr(index, 0x6800, tileSize);	// The MAP is required by the map engine to be at location 0x6800.
+	mapLoad(tldMap, tldTiles, tldProps);
 }
