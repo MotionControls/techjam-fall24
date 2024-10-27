@@ -3,15 +3,15 @@
 
 u16 CheckCollision_obj_obj(s_objectData *objA, s_objectData *objB) {
     u16 collision_result = 0;
-    u8 objALeft = UFXToChar(UFXAdd(objA->pData.wX, objA->pData.hitBoxOffsetX));
-    u8 objATop = UFXToChar(UFXAdd(objA->pData.wY, objA->pData.hitBoxOffsetY));
-    u8 objARight = objALeft + objA->pData.hitBoxSizeX;
-    u8 objABottom = objATop + objA->pData.hitBoxSizeY;
+    u16 objALeft = UFXToChar(UFXAdd(objA->pData.wX, objA->pData.hitBoxOffsetX));
+    u16 objATop = UFXToChar(UFXAdd(objA->pData.wY, objA->pData.hitBoxOffsetY));
+    u16 objARight = objALeft + objA->pData.hitBoxSizeX;
+    u16 objABottom = objATop + objA->pData.hitBoxSizeY;
 
-    u8 objBLeft = SFXToChar(SFXAdd(objB->pData.wX, objB->pData.hitBoxOffsetX));
-    u8 objBTop = SFXToChar(SFXAdd(objB->pData.wY, objB->pData.hitBoxOffsetY));
-    u8 objBRight = objBLeft + objB->pData.hitBoxSizeX;
-    u8 objBBottom = objBTop + objB->pData.hitBoxSizeY;
+    u16 objBLeft = UFXToChar(UFXAdd(objB->pData.wX, objB->pData.hitBoxOffsetX));
+    u16 objBTop = UFXToChar(UFXAdd(objB->pData.wY, objB->pData.hitBoxOffsetY));
+    u16 objBRight = objBLeft + objB->pData.hitBoxSizeX;
+    u16 objBBottom = objBTop + objB->pData.hitBoxSizeY;
 
     objA->pData.t = objATop;
     objA->pData.b = objABottom;
