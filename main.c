@@ -3,6 +3,7 @@
 #include <snes.h>
 #include "fp_math.h"
 #include "object_funcs.h"
+#include "level_defs.h"
 
 // Sprites
 extern char johnspr, johnspr_end;
@@ -74,8 +75,6 @@ void clear_lvl_objs(Level*);
 s_objectData Player_Init(u8 x, u8 y, ufx speed);
 s_objectData Target_Init(u8 x, u8 y, ufx speed);
 s_objectData Collider_Init(u8 x, u8 y, u8 sizeX, u8 sizeY);
-
-u8 level_obj_count;
 
 void BG_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8 *map, u16 mapSize, u16 mapMem);
 void TLD_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8* tldMap, u8* tldTiles, u8* tldProps, u8 mapTileSize);
@@ -170,19 +169,25 @@ Level Level_Init(u8 id) {
         100,
         100
     };
+    clear_lvl_objs(&loaded_level);
 
-    loaded_level.data = malloc(sizeof(s_levelData));
-    u16 i;
-    while(i < LEVEL_TILE_SIZE * LEVEL_TILE_SIZE) {
-        // 230/256 chance of a 0 (empty)
-        loaded_level.data->collision[i] = rand() > 230 ? 1 : 0;
+    u8 i = 0;
+    while(i < LEVEL_MAX_OBJECTS) {
+        s_objDef objDef = levelDefs[id].objects[i];
+        if(objDef.id  == (u8)-1) break;
+        switch(objDef.id) {
+            case OBJECT_PLAYER:
+                add_obj_to_lvl(Player_Init(objDef.x, objDef.y, CharToUFX(1, 0)), &curObjID, &loaded_level);
+                break;
+            case OBJECT_TARGET:
+                add_obj_to_lvl(Target_Init(objDef.x, objDef.y, CharToUFX(1, 0)), &curObjID, &loaded_level);
+                break;
+            case OBJECT_COLLIDER:
+                add_obj_to_lvl(Collider_Init(objDef.x, objDef.y, objDef.sizeX, objDef.sizeY), &curObjID, &loaded_level);
+                break;
+        }
         ++i;
     }
-    clear_lvl_objs(&loaded_level);
-    add_obj_to_lvl(Player_Init(loaded_level.xSpawn, loaded_level.ySpawn, CharToUFX(1, 0)), &curObjID, &loaded_level);
-    add_obj_to_lvl(Target_Init(200, 150, CharToUFX(0, 0)), &curObjID, &loaded_level);
-    add_obj_to_lvl(Collider_Init(150, 64, 32, 64), &curObjID, &loaded_level);
-    level_obj_count = curObjID;
     return loaded_level;
 }
 

@@ -19,7 +19,7 @@
   
   emu.drawRectangle(screenX + hitBoxOffsetX, screenY + hitBoxOffsetY, hitBoxSizeX, hitBoxSizeY, 0x304040FF, false, 1) 
   emu.drawRectangle(calHitBoxLeft, calHitBoxTop, calHitBoxRight - calHitBoxLeft, calHitBoxBottom - calHitBoxTop, 0x30FF000F, false, 2) 
-  if(objDataStart == 0x134) then
+  if(objDataStart == 0x104) then
   	emu.drawRectangle(8, 8, 128, 40, 0x304040FF, true, 1)
   	emu.drawRectangle(8, 8, 128, 40, 0x304040FF, false, 1)
   
