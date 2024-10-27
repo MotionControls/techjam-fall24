@@ -13,9 +13,12 @@ extern char iconsbg, iconsbg_end;
 extern char iconspal, iconspal_end;
 extern char iconsmap, iconsmap_end;
 
-extern char tileset, tileset_end, tileset_pal;
-extern char map_testlvl, map_tilesetatt, map_tilesetdef;
+// TILED
+extern char tiled_testbg, tiled_testbg_end;
+extern char tiled_testpal, tiled_testpal_end;
+extern char tiled_testmap, tiled_testtiles, tiled_testprops;
 
+// Font
 extern char snesfont, snespal;
 
 // Screen Stuffs
@@ -73,7 +76,7 @@ s_objectData Target_Init(u8 x, u8 y, ufx speed);
 u8 level_obj_count;
 
 void BG_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8 *map, u16 mapSize, u16 mapMem);
-void TLD_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8* tldMap, u8* tldTiles, u8* tldProps, u8 tileSize);
+void TLD_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8* tldMap, u8* tldTiles, u8* tldProps, u8 mapTileSize);
 
 int main(void) {
     // Init SNES
@@ -90,6 +93,7 @@ int main(void) {
     cur_level = Level_Init(0);
 
     //Init BG stuffs.
+	/*
     BG_Change(
         0,
         &iconsbg, (&iconsbg_end - &iconsbg),
@@ -97,38 +101,26 @@ int main(void) {
         MEM_BACKGROUNDS,
         &iconsmap, BG_MAP_SIZE,
         MEM_MAPS);
+	*/
+	TLD_Change(
+		0,
+		&tiled_testbg, (&tiled_testbg_end - &tiled_testbg),
+		&tiled_testpal, (&tiled_testpal_end - &tiled_testpal), 0,
+		0x0000,
+		(u8*)&tiled_testmap,
+		(u8*)&tiled_testtiles,
+		(u8*)&tiled_testprops,
+		SC_32x32);
 
-    // bgInitTileSet(0, &tileset, &tileset_pal, 0, (&tileset_end - &tileset), 16 * 2 * 3, BG_16COLORS, 0x2000);
-    // bgSetMapPtr(0, 0x6800, SC_64x32);
-
-    // // This needs to be done after ANY new backgrounds are loaded.
-    // // All accessible backgrounds are enabled by default.
+    // This needs to be done after ANY new backgrounds are loaded.
+    // All accessible backgrounds are enabled by default.
     bgSetDisable(1);
     bgSetDisable(2);
 
     setScreenOn();
 
-    // mapLoad((u8 *)&map_testlvl, (u8 *)&map_tilesetdef, (u8 *)&map_tilesetatt);
-
-
-    // // Activate Mode1 and set tile size to 8x8.
+    // Activate Mode1 and set tile size to 8x8.
     setMode(BG_MODE1, 0);
-    // // setMode(BG_MODE1, 1);
-
-    // bgInitTileSet(0, &tileset, &tileset_pal, 0, (&tileset_end - &tileset), 16 * 2 * 3, BG_16COLORS, 0x2000);
-    // bgSetMapPtr(0, 0x6800, SC_64x32);
-
-    // // Now Put in 16 color mode and disable Bgs except current
-    // setMode(BG_MODE1, 0);
-    // bgSetDisable(1);
-    // bgSetDisable(2);
-
-    // // Screen activated
-    // setScreenOn();
-
-    // // Load map in memory and update it regarding current location of the sprite
-    // mapLoad((u8 *)&map_testlvl, (u8 *)&map_tilesetdef, (u8 *)&map_tilesetatt);
-
 
     // Game Loop.
     while (1) {
@@ -140,6 +132,10 @@ int main(void) {
         // mapUpdateCamera(0, 0);
 
         Level_Tick(pad0, &cur_level);
+
+		// For whatever reason with the map engine this needs to be done every frame.
+		bgSetDisable(1);
+		bgSetDisable(2);
 
         WaitForVBlank();
         mapVblank();
@@ -263,16 +259,16 @@ void BG_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize,
     bgInitMapSet(index, map, mapSize, SC_32x32, mapMem);
 }
 
-/*	void TLD_Change(index, tiles, tilesSize, palette, paletteSize, paletteBank, tileMem, tldMap, tldTiles, tildProps, tileSize);
+/*	void TLD_Change(index, tiles, tilesSize, palette, paletteSize, paletteBank, tileMem, tldMap, tldTiles, tildProps, mapTileSize);
 	Changes the background at index, using the PV's MAP engine.
 ...			;	Shared with BG_Change().
 tldMap		;	TILED map data.
 tldTiles	;	TILED tile data.
 tldProps	;	TILED tile property data.
-tileSize	;	Size of the map in 8x8 tiles.
+mapTileSize	;	Size of the map in 8x8 tiles.
 */
-void TLD_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8* tldMap, u8* tldTiles, u8* tldProps, u8 tileSize){
+void TLD_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8* tldMap, u8* tldTiles, u8* tldProps, u8 mapTileSize){
 	bgInitTileSet(index, tiles, palette, paletteBank, tilesSize, paletteSize, BG_16COLORS, tileMem);
-    bgSetMapPtr(index, 0x6800, tileSize);	// The MAP is required by the map engine to be at location 0x6800.
+    bgSetMapPtr(index, 0x6800, mapTileSize);	// The MAP is required by the map engine to be at location 0x6800.
 	mapLoad(tldMap, tldTiles, tldProps);
 }

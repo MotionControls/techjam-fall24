@@ -29,12 +29,13 @@ bg_icons.pic: res/bg_icons.bmp
 	@echo convert bmp ... $(notdir $@)
 	$(GFXCONV) -s 8 -o 16 -u 16 -e 0 -t bmp -p -m -i $<
 
-tileset.pic: res/tileset.bmp
+# TILED Stuffs
+tiled_testset.pic: res/tiled_testset.png
 	@echo convert map tileset ... $(notdir $@)
-	$(GFXCONV) -s 16 -o 16 -u 16 -t bmp -i $<
+	$(GFXCONV) -s 8 -o 16 -u 16 -p -m -i $<
 
-lvl1.m16: res/test_lvl1.tmj tileset.pic
+tiled_test.m16: res/tiled_test.tmj tiled_testset.pic
 	@echo convert map tiled ... $(notdir $@)
-	$(TMXCONV) $< #res/bg_icons.map
+	$(TMXCONV) $< res/tiled_testset.map
 
-bitmaps : john.pic bg_icons.pic tileset.pic
+bitmaps : john.pic bg_icons.pic tiled_test.m16 tiled_testset.pic

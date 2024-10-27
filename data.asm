@@ -6,12 +6,10 @@
 ; Sprites ;
 ;;;;;;;;;;;
 johnspr:
-;.incbin "res/johnplaceholder.pic"
 .incbin "res/johnplaceholder2.pic"
 johnspr_end:
 
 johnpal:
-;.incbin "res/johnplaceholder.pal"
 .incbin "res/johnplaceholder2.pal"
 johnpal_end:
 
@@ -30,25 +28,26 @@ iconsmap:
 .incbin "res/bg_icons.map"
 iconsmap_end:
 
-tileset:
-.incbin "res/tileset.pic"
-tileset_end:
+;;;;;;;;;;;;;;;;
+; TILED Stuffs ;
+;;;;;;;;;;;;;;;;
 
-tileset_pal:
-.incbin "res/tileset.pal"
+tiled_testbg:
+.incbin "res/tiled_testset.pic"
+tiled_testbg_end:
 
-;;;;;;;;
-; Maps ;
-;;;;;;;;
+tiled_testpal:
+.incbin "res/tiled_testset.pal"
+tiled_testpal_end:
 
-map_testlvl:
-.incbin "res/BG1.m16"
+tiled_testmap:	; MAPS that are used in the map engine don't require any length.
+.incbin "res/tiled_test.m16"
 
-map_tilesetatt:
-.incbin "res/test_lvl1.b16"
+tiled_testtiles:
+.incbin "res/tiled_test.t16"
 
-map_tilesetdef:
-.incbin "res/test_lvl1.t16"
+tiled_testprops:
+.incbin "res/tiled_test.b16"
 
 ;;;;;;;;;
 ; Fonts ;
