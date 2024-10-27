@@ -13,32 +13,26 @@ u16 CheckCollision_obj_obj(s_objectData *objA, s_objectData *objB) {
     u16 objBRight = objBLeft + objB->pData.hitBoxSizeX;
     u16 objBBottom = objBTop + objB->pData.hitBoxSizeY;
 
-    objA->pData.t = objATop;
-    objA->pData.b = objABottom;
-    objA->pData.l = objALeft;
-    objA->pData.r = objARight;
-
-    objB->pData.t = objBTop;
-    objB->pData.b = objBBottom;
-    objB->pData.l = objBLeft;
-    objB->pData.r = objBRight;
-
     if (objALeft < objBRight && objARight > objBLeft && objATop < objBBottom && objABottom > objBTop) {
         collision_result |= 1;
         collision_result |= (objB->objID & 0b1111111) << 1;
 
         // This looks expensive...
-        if(objBLeft <= objARight && objALeft < objBLeft && objARight - objBLeft < 2) {
+        if(objBLeft <= objARight && objARight - objBLeft < 2) {
             collision_result |= 1 << 8;
+            goto finish_collision;
         }
-        if(objBRight >= objALeft && objARight > objBRight && objBRight - objALeft < 2) {
+        if(objBRight >= objALeft && objBRight - objALeft < 2) {
             collision_result |= 1 << 9;
+            goto finish_collision;
         }
-        if(objBTop <= objABottom && objATop < objBTop && objABottom - objBTop < 2) {
+        if(objBTop <= objABottom && objABottom - objBTop < 2) {
             collision_result |= 1 << 10;
+            goto finish_collision;
         }
-        if(objBBottom >= objATop && objABottom > objBBottom && objBBottom - objATop < 2) {
+        if(objBBottom >= objATop && objBBottom - objATop < 2) {
             collision_result |= 1 << 11;
+            goto finish_collision;
         }
     }
 
@@ -82,7 +76,8 @@ u8 Collide_obj_colliders(s_objectData* obj, Level* lvl) {
     u8 collision_dirs = 0;
     u8 i = 0;
     while(i < LEVEL_MAX_OBJECTS) {
-        if(lvl->data->objects[i].aData.sprState == 255) {
+        if(lvl->data->objects[i].aData.sprState == 255 || 
+        lvl->data->objects[i].objID != OBJECT_COLLIDER) {
             ++i;
             continue;
         }
@@ -91,14 +86,7 @@ u8 Collide_obj_colliders(s_objectData* obj, Level* lvl) {
             ++i;
             continue;
         }
-        u8 id = (col_res & 0b11111110) >> 1;
-        switch(id) {
-            case OBJECT_COLLIDER:
-                collision_dirs |= col_res >> 8;
-                break;
-            default:
-                break;
-        }
+        collision_dirs |= col_res >> 8;  
         ++i;
     }
     return collision_dirs;

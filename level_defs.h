@@ -46,6 +46,11 @@ s_levelDef levelDefs[1] = {
                 0, 16, 
                 16, 224
             },
+            {
+                OBJECT_COLLIDER,
+                100, 100, 
+                32, 32
+            },
             {-1}
         }
     }

@@ -71,10 +71,11 @@ Level Level_Init(u8 id);
 void Level_Tick(u16 pad0, Level *level);
 void add_obj_to_lvl(s_objectData obj, u8 *obj_id, Level *level);
 void clear_lvl_objs(Level*);
+u8 get_free_oamid(Level*);
 
-s_objectData Player_Init(u8 x, u8 y, ufx speed);
-s_objectData Target_Init(u8 x, u8 y, ufx speed);
-s_objectData Collider_Init(u8 x, u8 y, u8 sizeX, u8 sizeY);
+s_objectData Player_Init(u8 x, u8 y, ufx speed, Level* lvl);
+s_objectData Target_Init(u8 x, u8 y, ufx speed, Level* lvl);
+s_objectData Collider_Init(u8 x, u8 y, u8 sizeX, u8 sizeY, Level* lvl);
 
 void BG_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8 *map, u16 mapSize, u16 mapMem);
 void TLD_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8* tldMap, u8* tldTiles, u8* tldProps, u8 mapTileSize);
@@ -177,13 +178,13 @@ Level Level_Init(u8 id) {
         if(objDef.id  == (u8)-1) break;
         switch(objDef.id) {
             case OBJECT_PLAYER:
-                add_obj_to_lvl(Player_Init(objDef.x, objDef.y, CharToUFX(1, 0)), &curObjID, &loaded_level);
+                add_obj_to_lvl(Player_Init(objDef.x, objDef.y, CharToUFX(1, 0), &loaded_level), &curObjID, &loaded_level);
                 break;
             case OBJECT_TARGET:
-                add_obj_to_lvl(Target_Init(objDef.x, objDef.y, CharToUFX(1, 0)), &curObjID, &loaded_level);
+                add_obj_to_lvl(Target_Init(objDef.x, objDef.y, CharToUFX(1, 0), &loaded_level), &curObjID, &loaded_level);
                 break;
             case OBJECT_COLLIDER:
-                add_obj_to_lvl(Collider_Init(objDef.x, objDef.y, objDef.sizeX, objDef.sizeY), &curObjID, &loaded_level);
+                add_obj_to_lvl(Collider_Init(objDef.x, objDef.y, objDef.sizeX, objDef.sizeY, &loaded_level), &curObjID, &loaded_level);
                 break;
         }
         ++i;
@@ -204,15 +205,43 @@ void clear_lvl_objs(Level *level) {
     }
 }
 
+
+// don't... don't read it please
+u8 get_free_oamid(Level* level) {
+    // create an index
+    u16 i = 0;
+    // bitmask we use to mark free positions with 1's
+    u16 free_id = 0xFFFF;
+    while(i < LEVEL_MAX_OBJECTS) {
+        // if this sprite is free, we skip
+        if(level->data->objects[i].aData.sprState == 255) {
+            ++i;
+            continue;
+        }
+        // black magic bit manip
+        // essentially converts the multiples of 4 to bit positions
+        // so 4 * 3 (12) because OAM IDs are multiples of 4
+        // 4 * 3 becomes 1 << 3 for the mask, which marks OAM ID 12 as in-use
+        free_id &= ~(1 << (level->data->objects[i].sData.oamID >> 2));
+        ++i;
+    }
+    i = 0;
+    // increment i until we find an unused OAM ID, prefering lower ones
+    while((free_id & (1 << i)) == 0) {
+        i++;
+    }
+    return i << 2;
+}
+
 // Functions
 /*	Player Player_Init(x, y, speed);
 	Returns a player struct.
 x, y	;	Starting position.
 speed	;	Starting speed.
 */
-s_objectData Player_Init(u8 x, u8 y, ufx speed) {
+s_objectData Player_Init(u8 x, u8 y, ufx speed, Level* lvl) {
     // Init player.
-    s_objectData player = generic_init_obj(OBJECT_PLAYER, x, y, speed, PLAYER_OAMID, PLAYER_PALETTE, &player_tick, &player_draw);
+    s_objectData player = generic_init_obj(OBJECT_PLAYER, x, y, speed, get_free_oamid(lvl), PLAYER_PALETTE, &player_tick, &player_draw);
 
     // Init OAM object.
     oamInitGfxSet(
@@ -221,7 +250,7 @@ s_objectData Player_Init(u8 x, u8 y, ufx speed) {
         PLAYER_PALETTE_BANK,                       // Palette Bank
         MEM_SPRITES,                               // Where to put sprites.
         SPR_SIZE_16x32                             // Size of sprites.
-        );
+    );
 
     oamSet(player.sData.oamID, player.pData.scrX, player.pData.scrY, 3, 0, 0, 0, 0);
     oamSetEx(player.sData.oamID, OBJ_SMALL, 1);
@@ -242,9 +271,9 @@ s_objectData Player_Init(u8 x, u8 y, ufx speed) {
 x, y	;	Starting position.
 speed	;	Starting speed.
 */
-s_objectData Target_Init(u8 x, u8 y, ufx speed) {
+s_objectData Target_Init(u8 x, u8 y, ufx speed, Level* lvl) {
     // Init target.
-    s_objectData target = generic_init_obj(OBJECT_TARGET, x, y, speed, 4, PLAYER_PALETTE, &target_tick, &target_draw);
+    s_objectData target = generic_init_obj(OBJECT_TARGET, x, y, speed, get_free_oamid(lvl), PLAYER_PALETTE, &target_tick, &target_draw);
 
     // Init OAM object.
     oamInitGfxSet(
@@ -253,7 +282,7 @@ s_objectData Target_Init(u8 x, u8 y, ufx speed) {
         PLAYER_PALETTE_BANK,                       // Palette Bank
         MEM_SPRITES,                               // Where to put sprites.
         SPR_SIZE_16x32                             // Size of sprites.
-        );
+    );
 
     oamSet(target.sData.oamID, target.pData.scrX, target.pData.scrY, 3, 0, 0, 0, 0);
     oamSetEx(target.sData.oamID, OBJ_SMALL, 1);
@@ -269,7 +298,7 @@ s_objectData Target_Init(u8 x, u8 y, ufx speed) {
 x, y	        ;	Starting position.
 sizeX, sizeY	;	Size.
 */
-s_objectData Collider_Init(u8 x, u8 y, u8 sizeX, u8 sizeY) {
+s_objectData Collider_Init(u8 x, u8 y, u8 sizeX, u8 sizeY, Level* lvl) {
     // Init collider.
     s_objectData collider = generic_init_obj(OBJECT_COLLIDER, x, y, 0, 0, 0, NULL, NULL);
 

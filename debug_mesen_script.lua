@@ -18,25 +18,16 @@
   screenX = emu.read(objDataStart, emu.memType.snesWorkRam, false)
   
   emu.drawRectangle(screenX + hitBoxOffsetX, screenY + hitBoxOffsetY, hitBoxSizeX, hitBoxSizeY, 0x304040FF, false, 1) 
-  emu.drawRectangle(calHitBoxLeft, calHitBoxTop, calHitBoxRight - calHitBoxLeft, calHitBoxBottom - calHitBoxTop, 0x30FF000F, false, 2) 
-  if(objDataStart == 0x104) then
-  	emu.drawRectangle(8, 8, 128, 40, 0x304040FF, true, 1)
-  	emu.drawRectangle(8, 8, 128, 40, 0x304040FF, false, 1)
-  
-	  emu.drawString(12, 12, "Player Left Pos: " .. calHitBoxLeft, 0xFFFFFF, 0xFF000000)
-	  emu.drawString(12, 21, "Player Right Pos: " .. calHitBoxRight, 0xFFFFFF, 0xFF000000)
-	  emu.drawString(12, 30, "Player Top Pos: " .. calHitBoxTop, 0xFFFFFF, 0xFF000000)
-	  emu.drawString(12, 39, "Player Bottom Pos: " .. calHitBoxBottom, 0xFFFFFF, 0xFF000000)
-  end
 end
 
 function drawAllHitboxes()
 	startObjIdx = 0x104
+	objDataBlockSize = 0x30
 	for i=0,15 do
-		objIdx = startObjIdx + (i * 0x30)
+		objIdx = startObjIdx + (i * objDataBlockSize)
 		active = emu.read(objIdx + 0x21, emu.memType.snesWorkRam, false)
 		if not (active == 255) then
-			drawSpriteHitbox(startObjIdx + (i * 0x30))
+			drawSpriteHitbox(startObjIdx + (i * objDataBlockSize))
 		end
 	end
 end
