@@ -3,12 +3,27 @@
 #include "objects.h"
 #include <snes.h>
 
+// Player Stuffs
+#define PLAYER_OAMID 0 // This is ideally the ONLY OAM that should be const.
+#define PLAYER_HORT 16
+#define PLAYER_VERT 32
+#define PLAYER_SPRITES &johnspr
+#define PLAYER_SPRITES_SIZE (&johnspr_end - &johnspr)
+#define PLAYER_PALETTE &johnpal
+#define PLAYER_PALETTE_SIZE (&johnpal_end - &johnpal)
+#define PLAYER_PALETTE_BANK 0
+
 enum COLLISION_RESULT_DIR {
     COLLISION_UP =    0b1000,
     COLLISION_DOWN =  0b0100,
     COLLISION_LEFT =  0b0010,
     COLLISION_RIGHT = 0b0001
 };
+
+void add_obj_to_lvl(s_objectData obj, Level *level);
+void clear_lvl_objs(Level *level);
+u8 get_free_oamid(Level*);
+u8 get_free_obj_slot(Level*);
 
 u16 CheckCollision_obj_obj(s_objectData *objA, s_objectData *objB);
 u8 Collide_obj_colliders(s_objectData* obj, Level* lvl);

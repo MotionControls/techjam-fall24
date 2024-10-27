@@ -1,6 +1,56 @@
 #include "object_funcs.h"
 #include "sprite_tables.h"
 
+void add_obj_to_lvl(s_objectData obj, Level *level) {
+    u8 idx = get_free_obj_slot(level);
+    level->data->objects[idx] = obj;
+}
+
+void clear_lvl_objs(Level *level) {
+    u8 i = 0;
+    while(i < LEVEL_MAX_OBJECTS) {
+        level->data->objects[i].aData.sprState = 255;
+        ++i;
+    }
+}
+
+// don't... don't read it please
+u8 get_free_oamid(Level* level) {
+    // create an index
+    u16 i = 0;
+    // bitmask we use to mark free positions with 1's
+    u16 free_id = 0xFFFF;
+    while(i < LEVEL_MAX_OBJECTS) {
+        // if this sprite is free, we skip
+        if(level->data->objects[i].aData.sprState == 255) {
+            ++i;
+            continue;
+        }
+        // black magic bit manip
+        // essentially converts the multiples of 4 to bit positions
+        // so 4 * 3 (12) because OAM IDs are multiples of 4
+        // 4 * 3 becomes 1 << 3 for the mask, which marks OAM ID 12 as in-use
+        free_id &= ~(1 << (level->data->objects[i].sData.oamID >> 2));
+        ++i;
+    }
+    i = 0;
+    // increment i until we find an unused OAM ID, prefering lower ones
+    while((free_id & (1 << i)) == 0) {
+        i++;
+    }
+    return i << 2;
+}
+
+u8 get_free_obj_slot(Level* level) {
+    // create an index
+    u8 i = 0;
+    while(level->data->objects[i].aData.sprState != 255 && i <= LEVEL_MAX_OBJECTS) {
+        ++i;
+    }
+    if(i == LEVEL_MAX_OBJECTS) i = -1;
+    return i;
+}
+
 u16 CheckCollision_obj_obj(s_objectData *objA, s_objectData *objB) {
     u16 collision_result = 0;
     u16 objALeft = UFXToChar(UFXAdd(objA->pData.wX, objA->pData.hitBoxOffsetX));
@@ -50,6 +100,26 @@ u16 CheckCollision_obj_obj(s_objectData *objA, s_objectData *objB) {
     return collision_result;
 }
 
+u8 Collide_obj_colliders(s_objectData* obj, Level* lvl) {
+    u8 collision_dirs = 0;
+    u8 i = 0;
+    while(i < LEVEL_MAX_OBJECTS) {
+        if(lvl->data->objects[i].aData.sprState == 255 || 
+        lvl->data->objects[i].objID != OBJECT_COLLIDER) {
+            ++i;
+            continue;
+        }
+        u16 col_res = CheckCollision_obj_obj(obj, &lvl->data->objects[i]);
+        if(col_res & 1 == 0) {
+            ++i;
+            continue;
+        }
+        collision_dirs |= col_res >> 8;  
+        ++i;
+    }
+    return collision_dirs;
+}
+
 s_objectData generic_init_obj(u8 id, u8 x, u8 y, ufx speed, u8 oamID, u8* palette, void (*update_ptr)(u16, struct s_objectData *), void (*draw_ptr)(struct s_objectData *))
 {
     s_objectData obj = {
@@ -70,26 +140,6 @@ s_objectData generic_init_obj(u8 id, u8 x, u8 y, ufx speed, u8 oamID, u8* palett
     update_ptr,
     draw_ptr};
     return obj;
-}
-
-u8 Collide_obj_colliders(s_objectData* obj, Level* lvl) {
-    u8 collision_dirs = 0;
-    u8 i = 0;
-    while(i < LEVEL_MAX_OBJECTS) {
-        if(lvl->data->objects[i].aData.sprState == 255 || 
-        lvl->data->objects[i].objID != OBJECT_COLLIDER) {
-            ++i;
-            continue;
-        }
-        u16 col_res = CheckCollision_obj_obj(obj, &lvl->data->objects[i]);
-        if(col_res & 1 == 0) {
-            ++i;
-            continue;
-        }
-        collision_dirs |= col_res >> 8;  
-        ++i;
-    }
-    return collision_dirs;
 }
 
 void player_tick(u16 pad0, s_objectData *player, Level* level) {
@@ -149,7 +199,7 @@ void player_draw(s_objectData *player) {
 }
 
 void target_tick(u16 pad0, s_objectData *target, Level* level) {
-    target->pData.dX = target->pData.dY = 100;
+    // target->pData.dX = target->pData.dY = 100;
 
     target->pData.wX += target->pData.dX;
     target->pData.wY += target->pData.dY;
@@ -197,3 +247,4 @@ void generic_copy_data_to_sneslib_obj(s_objectData *sobj, t_objs *tobj) {
 	tobj->ypos = SFXToChar(sobj->pData.wY);
 	*/
 }
+

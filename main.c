@@ -69,9 +69,6 @@ Level cur_level;
 
 Level Level_Init(u8 id);
 void Level_Tick(u16 pad0, Level *level);
-void add_obj_to_lvl(s_objectData obj, u8 *obj_id, Level *level);
-void clear_lvl_objs(Level*);
-u8 get_free_oamid(Level*);
 
 s_objectData Player_Init(u8 x, u8 y, ufx speed, Level* lvl);
 s_objectData Target_Init(u8 x, u8 y, ufx speed, Level* lvl);
@@ -178,59 +175,18 @@ Level Level_Init(u8 id) {
         if(objDef.id  == (u8)-1) break;
         switch(objDef.id) {
             case OBJECT_PLAYER:
-                add_obj_to_lvl(Player_Init(objDef.x, objDef.y, CharToUFX(1, 0), &loaded_level), &curObjID, &loaded_level);
+                add_obj_to_lvl(Player_Init(objDef.x, objDef.y, CharToUFX(1, 0), &loaded_level), &loaded_level);
                 break;
             case OBJECT_TARGET:
-                add_obj_to_lvl(Target_Init(objDef.x, objDef.y, CharToUFX(1, 0), &loaded_level), &curObjID, &loaded_level);
+                add_obj_to_lvl(Target_Init(objDef.x, objDef.y, CharToUFX(1, 0), &loaded_level), &loaded_level);
                 break;
             case OBJECT_COLLIDER:
-                add_obj_to_lvl(Collider_Init(objDef.x, objDef.y, objDef.sizeX, objDef.sizeY, &loaded_level), &curObjID, &loaded_level);
+                add_obj_to_lvl(Collider_Init(objDef.x, objDef.y, objDef.sizeX, objDef.sizeY, &loaded_level), &loaded_level);
                 break;
         }
         ++i;
     }
     return loaded_level;
-}
-
-void add_obj_to_lvl(s_objectData obj, u8 *obj_id, Level *level) {
-    level->data->objects[*obj_id] = obj;
-    (*obj_id)++;
-}
-
-void clear_lvl_objs(Level *level) {
-    u8 i = 0;
-    while(i < LEVEL_MAX_OBJECTS) {
-        level->data->objects[i].aData.sprState = 255;
-        ++i;
-    }
-}
-
-
-// don't... don't read it please
-u8 get_free_oamid(Level* level) {
-    // create an index
-    u16 i = 0;
-    // bitmask we use to mark free positions with 1's
-    u16 free_id = 0xFFFF;
-    while(i < LEVEL_MAX_OBJECTS) {
-        // if this sprite is free, we skip
-        if(level->data->objects[i].aData.sprState == 255) {
-            ++i;
-            continue;
-        }
-        // black magic bit manip
-        // essentially converts the multiples of 4 to bit positions
-        // so 4 * 3 (12) because OAM IDs are multiples of 4
-        // 4 * 3 becomes 1 << 3 for the mask, which marks OAM ID 12 as in-use
-        free_id &= ~(1 << (level->data->objects[i].sData.oamID >> 2));
-        ++i;
-    }
-    i = 0;
-    // increment i until we find an unused OAM ID, prefering lower ones
-    while((free_id & (1 << i)) == 0) {
-        i++;
-    }
-    return i << 2;
 }
 
 // Functions

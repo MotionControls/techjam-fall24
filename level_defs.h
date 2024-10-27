@@ -18,38 +18,33 @@ s_levelDef levelDefs[1] = {
         {
             {
                 OBJECT_PLAYER,
-                100, 100,
+                96, 96,
                 0, 0
             },
             {
                 OBJECT_TARGET,
-                150, 200,
+                128, 96,
                 0, 0
             },
             {
                 OBJECT_COLLIDER,
-                240, 0, 
-                16, 240
+                80, 64, 
+                80, 16
             },
             {
                 OBJECT_COLLIDER,
-                0, 0, 
-                240, 16
+                80, 80, 
+                16, 48
             },
             {
                 OBJECT_COLLIDER,
-                16, 207, 
-                224, 16
+                80, 128,
+                80, 16
             },
             {
                 OBJECT_COLLIDER,
-                0, 16, 
-                16, 224
-            },
-            {
-                OBJECT_COLLIDER,
-                100, 100, 
-                32, 32
+                144, 80, 
+                16, 48
             },
             {-1}
         }

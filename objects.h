@@ -47,7 +47,7 @@ typedef struct {
 
 // Level Stuffs
 #define LEVEL_TILE_SIZE 16
-#define LEVEL_MAX_OBJECTS 16
+#define LEVEL_MAX_OBJECTS 20
 
 typedef struct {
   u8 numObj;                                       // Number of objects in the level
