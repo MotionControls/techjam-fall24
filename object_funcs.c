@@ -200,11 +200,12 @@ void generic_copy_data_to_sneslib_obj(s_objectData *sobj, t_objs *tobj) {
 	//tobj->tempo = ???;						// What the fuck is tempo?
 	//tobj->xofs = sobj->pData.hitBoxOffsetX;	// May be a stretch?
 	//tobj->yofs = sobj->pData.hitBoxOffsetY;
-	
+	/*
 	tobj->height = sobj->pData.hitBoxSizeY;
 	tobj->width = sobj->pData.hitBoxSizeX;
 	tobj->sprframe = sobj->aData.curFrame;
 	tobj->sprnum = sobj->sData.oamID;
 	tobj->xpos = SFXToChar(sobj->pData.wX);
 	tobj->ypos = SFXToChar(sobj->pData.wY);
+	*/
 }
