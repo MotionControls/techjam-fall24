@@ -15,7 +15,8 @@ const u8 playerSpriteTable[12] = {
 enum PlayerStates {
     PS_DOWN = 0,
 	PS_UP = 4,
-	PS_SIDE = 8
+	PS_SIDE = 8,
+	PS_SHOOT = 12,
 };
 
 #endif

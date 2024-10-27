@@ -1,8 +1,8 @@
 #include "object_funcs.h"
 #include "sprite_tables.h"
 
-u8 CheckCollision_obj_obj(s_objectData *objA, s_objectData *objB) {
-    u8 collision_result = 0;
+u16 CheckCollision_obj_obj(s_objectData *objA, s_objectData *objB) {
+    u16 collision_result = 0;
     u8 objALeft = UFXToChar(UFXAdd(objA->pData.wX, objA->pData.hitBoxOffsetX));
     u8 objATop = UFXToChar(UFXAdd(objA->pData.wY, objA->pData.hitBoxOffsetY));
     u8 objARight = objALeft + objA->pData.hitBoxSizeX;
@@ -25,66 +25,38 @@ u8 CheckCollision_obj_obj(s_objectData *objA, s_objectData *objB) {
 
     if (objALeft < objBRight && objARight > objBLeft && objATop < objBBottom && objABottom > objBTop) {
         collision_result |= 1;
+        collision_result |= (objB->objID & 0b1111111) << 1;
+
+        // This looks expensive...
+        if(objBLeft <= objARight && objALeft < objBLeft && objARight - objBLeft < 2) {
+            collision_result |= 1 << 8;
+        }
+        if(objBRight >= objALeft && objARight > objBRight && objBRight - objALeft < 2) {
+            collision_result |= 1 << 9;
+        }
+        if(objBTop <= objABottom && objATop < objBTop && objABottom - objBTop < 2) {
+            collision_result |= 1 << 10;
+        }
+        if(objBBottom >= objATop && objABottom > objBBottom && objBBottom - objATop < 2) {
+            collision_result |= 1 << 11;
+        }
     }
+
+    finish_collision:
+
+    // Ends up looking like
+    // 0000tblr iiiiiiic
+    // t - collision on top of objA
+    // b - collision on bottom of objA
+    // l - collision on left of objA
+    // r - collision on right of objA
+    // i - objB ID
+    // c - collision happening
+
     return collision_result;
 }
 
-u8 CheckCollision_obj_level(s_objectData *objA, Level* level) {
-    u8 collision_result = 0;
-    u8 objALeft = UFXToChar(UFXAdd(objA->pData.wX, objA->pData.hitBoxOffsetX));
-    u8 objATop = UFXToChar(UFXAdd(objA->pData.wY, objA->pData.hitBoxOffsetY));
-    u8 objARight = objALeft + objA->pData.hitBoxSizeX;
-    u8 objABottom = objATop + objA->pData.hitBoxSizeY;
-
-    objA->pData.t = objATop;
-    objA->pData.b = objABottom;
-    objA->pData.l = objALeft;
-    objA->pData.r = objARight;
-
-    // this is so so so bad lmao
-    // im just like... not functioning in the brain rn
-    u16 i = (objALeft / 8) + LEVEL_TILE_SIZE * (objATop / 8);
-    while(i < LEVEL_TILE_SIZE * LEVEL_TILE_SIZE) {
-        if(level->data->collision[i] == 0) {
-            ++i;
-            continue;
-        }
-        ++i;
-
-        u8 x = i % LEVEL_TILE_SIZE;
-        u8 y = i / LEVEL_TILE_SIZE;
-        u8 tileLeft = x * 16;
-        u8 tileTop = y * 16;
-        u8 tileRight = tileLeft + 16;
-        u8 tileBottom = tileTop + 16;
-
-        if (objALeft < tileRight && objARight > tileLeft && objATop < tileBottom && objABottom > tileTop) {
-            if(y < objATop) {
-                collision_result |= COLLISION_UP;
-                continue;
-            }
-            if(y > objABottom) {
-                collision_result |= COLLISION_DOWN;
-                continue;
-            }
-            if(x < objALeft) {
-                collision_result |= COLLISION_LEFT;
-                continue;
-            }
-            if(x > objARight) {
-                collision_result |= COLLISION_RIGHT;
-                continue;
-            }
-        }
-
-        if(tileTop > objABottom && tileLeft > objARight) break;
-    }
-
-    
-    return collision_result;
-}
-
-s_objectData generic_init_obj(u8 x, u8 y, ufx speed, u8 oamID, u8* palette, void (*update_ptr)(u16, struct s_objectData *), void (*draw_ptr)(struct s_objectData *))
+s_objectData generic_init_obj(u8 id, u8 x, u8 y, ufx speed, u8 oamID, u8* palette, void (*update_ptr)(u16, struct s_objectData *), void (*draw_ptr)(struct s_objectData *))
 {
     s_objectData obj = {
     {x, y,
@@ -100,32 +72,60 @@ s_objectData generic_init_obj(u8 x, u8 y, ufx speed, u8 oamID, u8* palette, void
         0,
         palette},
     {0, 0, 0, 0},
+    id,
     update_ptr,
     draw_ptr};
     return obj;
 }
 
+u8 Collide_obj_colliders(s_objectData* obj, Level* lvl) {
+    u8 collision_dirs = 0;
+    u8 i = 0;
+    while(i < LEVEL_MAX_OBJECTS) {
+        if(lvl->data->objects[i].aData.sprState == 255) {
+            ++i;
+            continue;
+        }
+        u16 col_res = CheckCollision_obj_obj(obj, &lvl->data->objects[i]);
+        if(col_res & 1 == 0) {
+            ++i;
+            continue;
+        }
+        u8 id = (col_res & 0b11111110) >> 1;
+        switch(id) {
+            case OBJECT_COLLIDER:
+                collision_dirs |= col_res >> 8;
+                break;
+            default:
+                break;
+        }
+        ++i;
+    }
+    return collision_dirs;
+}
+
 void player_tick(u16 pad0, s_objectData *player, Level* level) {
     // Physics.
     player->pData.dX = player->pData.dY = 0;
-    u8 collision_result = CheckCollision_obj_level(player, level);
+    u8 collision_dirs = Collide_obj_colliders(player, level);
+
     if (pad0) { // If a button has been pressed.
         // Movement
-        if (pad0 & KEY_LEFT && !(collision_result & COLLISION_LEFT)){
+        if (pad0 & KEY_LEFT && !(collision_dirs & COLLISION_LEFT)){
             player->pData.dX = -player->pData.speed;
 			player->aData.sprState = PS_SIDE;
 			player->sData.hFlip = 0;
 		}
-        if (pad0 & KEY_RIGHT && !(collision_result & COLLISION_RIGHT)){
+        if (pad0 & KEY_RIGHT && !(collision_dirs & COLLISION_RIGHT)){
             player->pData.dX = player->pData.speed;
 			player->aData.sprState = PS_SIDE;
 			player->sData.hFlip = 1;
 		}
-        if (pad0 & KEY_UP && !(collision_result & COLLISION_UP)){
+        if (pad0 & KEY_UP && !(collision_dirs & COLLISION_UP)){
             player->pData.dY = -player->pData.speed;
 			player->aData.sprState = PS_UP;
 		}
-        if (pad0 & KEY_DOWN && !(collision_result & COLLISION_DOWN)){
+        if (pad0 & KEY_DOWN && !(collision_dirs & COLLISION_DOWN)){
 			player->pData.dY = player->pData.speed;
 			player->aData.sprState = PS_DOWN;
 		}

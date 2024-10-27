@@ -3,6 +3,12 @@
 #include <snes/snestypes.h>
 #include "fp_math.h"
 
+typedef enum {
+  OBJECT_PLAYER = 0,
+  OBJECT_TARGET = 1,
+  OBJECT_COLLIDER = 2
+} e_objectID;
+
 typedef struct {
   u8 scrX, scrY;
   sfx wX, wY;
@@ -25,7 +31,7 @@ typedef struct {
 
 typedef struct {
   u8 curFrame;   // The index of the current frame from the animation table.
-  u8 sprState;   // The sprite state of the object.
+  u8 sprState;   // The sprite state of the object. *Never* set to 255, refers to an inactive sprite
   u8 frameTimer; // The amount of time the current frame has lasted.
   u8 timePerFrame;
 } s_animData;
@@ -34,6 +40,7 @@ typedef struct {
   s_physicsData pData;
   s_spriteData sData;
   s_animData aData;
+  u8 objID;
   void (*update_ptr)(u16, struct s_objectData *, struct Level *);
   void (*draw_ptr)(struct s_objectData *);
 } s_objectData;

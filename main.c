@@ -69,9 +69,11 @@ Level cur_level;
 Level Level_Init(u8 id);
 void Level_Tick(u16 pad0, Level *level);
 void add_obj_to_lvl(s_objectData obj, u8 *obj_id, Level *level);
+void clear_lvl_objs(Level*);
 
 s_objectData Player_Init(u8 x, u8 y, ufx speed);
 s_objectData Target_Init(u8 x, u8 y, ufx speed);
+s_objectData Collider_Init(u8 x, u8 y, u8 sizeX, u8 sizeY);
 
 u8 level_obj_count;
 
@@ -145,9 +147,13 @@ int main(void) {
 
 void Level_Tick(u16 pad0, Level *level) {
     u8 i = 0;
-    while(i < level_obj_count) {
-        (*level->data->objects[i].update_ptr)(pad0, &level->data->objects[i], level);
-        (*level->data->objects[i].draw_ptr)(&level->data->objects[i]);
+    while(i < LEVEL_MAX_OBJECTS) {
+        if(level->data->objects[i].aData.sprState == 255) {
+            ++i;
+            continue;
+        }
+        if(level->data->objects[i].update_ptr) (*level->data->objects[i].update_ptr)(pad0, &level->data->objects[i], level);
+        if(level->data->objects[i].draw_ptr) (*level->data->objects[i].draw_ptr)(&level->data->objects[i]);
         ++i;
     }
 }
@@ -172,8 +178,10 @@ Level Level_Init(u8 id) {
         loaded_level.data->collision[i] = rand() > 230 ? 1 : 0;
         ++i;
     }
+    clear_lvl_objs(&loaded_level);
     add_obj_to_lvl(Player_Init(loaded_level.xSpawn, loaded_level.ySpawn, CharToUFX(1, 0)), &curObjID, &loaded_level);
     add_obj_to_lvl(Target_Init(200, 150, CharToUFX(0, 0)), &curObjID, &loaded_level);
+    add_obj_to_lvl(Collider_Init(150, 64, 32, 64), &curObjID, &loaded_level);
     level_obj_count = curObjID;
     return loaded_level;
 }
@@ -181,6 +189,14 @@ Level Level_Init(u8 id) {
 void add_obj_to_lvl(s_objectData obj, u8 *obj_id, Level *level) {
     level->data->objects[*obj_id] = obj;
     (*obj_id)++;
+}
+
+void clear_lvl_objs(Level *level) {
+    u8 i = 0;
+    while(i < LEVEL_MAX_OBJECTS) {
+        level->data->objects[i].aData.sprState = 255;
+        ++i;
+    }
 }
 
 // Functions
@@ -191,7 +207,7 @@ speed	;	Starting speed.
 */
 s_objectData Player_Init(u8 x, u8 y, ufx speed) {
     // Init player.
-    s_objectData player = generic_init_obj(x, y, speed, PLAYER_OAMID, PLAYER_PALETTE, &player_tick, &player_draw);
+    s_objectData player = generic_init_obj(OBJECT_PLAYER, x, y, speed, PLAYER_OAMID, PLAYER_PALETTE, &player_tick, &player_draw);
 
     // Init OAM object.
     oamInitGfxSet(
@@ -223,7 +239,7 @@ speed	;	Starting speed.
 */
 s_objectData Target_Init(u8 x, u8 y, ufx speed) {
     // Init target.
-    s_objectData target = generic_init_obj(x, y, speed, 4, PLAYER_PALETTE, &target_tick, &target_draw);
+    s_objectData target = generic_init_obj(OBJECT_TARGET, x, y, speed, 4, PLAYER_PALETTE, &target_tick, &target_draw);
 
     // Init OAM object.
     oamInitGfxSet(
@@ -238,7 +254,25 @@ s_objectData Target_Init(u8 x, u8 y, ufx speed) {
     oamSetEx(target.sData.oamID, OBJ_SMALL, 1);
     oamSetVisible(target.sData.oamID, OBJ_SHOW);
 
+    target.aData.sprState = 0;
+
     return target;
+}
+
+/*	Player Target_Init(x, y, speed);
+	Returns a collider object.
+x, y	        ;	Starting position.
+sizeX, sizeY	;	Size.
+*/
+s_objectData Collider_Init(u8 x, u8 y, u8 sizeX, u8 sizeY) {
+    // Init collider.
+    s_objectData collider = generic_init_obj(OBJECT_COLLIDER, x, y, 0, 0, 0, NULL, NULL);
+
+    collider.pData.hitBoxSizeX = sizeX;
+    collider.pData.hitBoxSizeY = sizeY;
+    collider.aData.sprState = 0;
+
+    return collider;
 }
 
 /*	void BG_Change(index, tiles, tilesSize, palette, paletteSize, paletteBank, tileMem, map, mapSize, mapMem);

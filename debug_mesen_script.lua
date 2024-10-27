@@ -17,10 +17,10 @@
   
   emu.drawRectangle(screenX + hitBoxOffsetX, screenY + hitBoxOffsetY, hitBoxSizeX, hitBoxSizeY, 0x304040FF, false, 1) 
   emu.drawRectangle(calHitBoxLeft, calHitBoxTop, calHitBoxRight - calHitBoxLeft, calHitBoxBottom - calHitBoxTop, 0x30FF000F, false, 2) 
-
-  emu.drawRectangle(8, 8, 128, 40, 0x304040FF, true, 1)
-  emu.drawRectangle(8, 8, 128, 40, 0x304040FF, false, 1)
   if(objDataStart == 0x104) then
+  	emu.drawRectangle(8, 8, 128, 40, 0x304040FF, true, 1)
+  	emu.drawRectangle(8, 8, 128, 40, 0x304040FF, false, 1)
+  
 	  emu.drawString(12, 12, "Player Left Pos: " .. calHitBoxLeft, 0xFFFFFF, 0xFF000000)
 	  emu.drawString(12, 21, "Player Right Pos: " .. calHitBoxRight, 0xFFFFFF, 0xFF000000)
 	  emu.drawString(12, 30, "Player Top Pos: " .. calHitBoxTop, 0xFFFFFF, 0xFF000000)
@@ -29,10 +29,14 @@
 end
 
 function drawAllHitboxes()
-	-- player object
-	drawSpriteHitbox(0x104)
-	-- target object
-	drawSpriteHitbox(0x12c)
+	startObjIdx = 0x104
+	for i=0,15 do
+		objIdx = startObjIdx + (i * 0x2c)
+		active = emu.read(objIdx + 0x1D, emu.memType.snesWorkRam, false)
+		if not (active == 255) then
+			drawSpriteHitbox(startObjIdx + (i * 0x2c))
+		end
+	end
 end
 
 emu.addEventCallback(drawAllHitboxes, emu.eventType.endFrame);

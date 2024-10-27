@@ -10,10 +10,10 @@ enum COLLISION_RESULT_DIR {
     COLLISION_RIGHT = 0b0001
 };
 
-u8 CheckCollision_obj_obj(s_objectData *objA, s_objectData *objB);
-u8 CheckCollision_obj_level(s_objectData *objA, Level* level);
+u16 CheckCollision_obj_obj(s_objectData *objA, s_objectData *objB);
+u8 Collide_obj_colliders(s_objectData* obj, Level* lvl);
 
-s_objectData generic_init_obj(
+s_objectData generic_init_obj(u8 id,
     u8 x, u8 y, 
     ufx speed, 
     u8 oamID, u8* palette, 
