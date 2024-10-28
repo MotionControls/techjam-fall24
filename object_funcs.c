@@ -356,9 +356,9 @@ void target_draw(s_objectData *target) {
 }
 
 void bullet_tick(u16 pad0, s_objectData *bullet, Level* level) {
-    u8 collision_dirs = Collide_obj_colliders(bullet, level);
+    //u8 collision_dirs = Collide_obj_colliders(bullet, level);
 
-    //if(collision_dirs & 1 > 0) bullet->aData.sprState = 255;
+    // if(collision_dirs & 1 > 0) bullet->aData.sprState = 255;
 
     bullet->pData.wX += bullet->pData.dX;
     bullet->pData.wY += bullet->pData.dY;
@@ -368,7 +368,7 @@ void bullet_tick(u16 pad0, s_objectData *bullet, Level* level) {
 }
 
 void bullet_draw(s_objectData *bullet) {
-    // generic_draw(bullet);
+    generic_draw(bullet);
 }
 
 void generic_draw(s_objectData *object) {
