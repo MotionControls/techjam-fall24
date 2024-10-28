@@ -12,9 +12,6 @@ extern char johnpal, johnpal_end;
 extern char sheepspr, sheepspr_end;
 extern char sheeppal, sheeppal_end;
 
-extern char bulletspr, bulletspr_end;
-extern char bulletbluepal, bulletbluepal_end;
-
 // BGs
 extern char iconsbg, iconsbg_end;
 extern char iconspal, iconspal_end;
