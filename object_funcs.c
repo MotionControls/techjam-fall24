@@ -68,7 +68,7 @@ s_objectData Player_Init(u8 x, u8 y, ufx speed, Level* lvl) {
         &bulletspr, (&bulletspr_end - &bulletspr),
         &bulletbluepal, (&bulletbluepal_end - &bulletbluepal),
         PLAYER_PALETTE_BANK+1,
-        0x5C00,
+        0x5400,
         SPR_SIZE_16x16
     );
 
