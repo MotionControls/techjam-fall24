@@ -41,4 +41,9 @@ enum PlayerStates {
 	PS_SIDE = 8
 };
 
+enum SoulStates{
+	SS_IDLE = 0,
+	SS_DEAD = 2
+}
+
 #endif
