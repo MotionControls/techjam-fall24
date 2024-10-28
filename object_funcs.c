@@ -7,6 +7,9 @@ extern char sheeppal, sheeppal_end;
 extern char bulletspr, bulletspr_end;
 extern char bulletbluepal, bulletbluepal_end;
 
+extern char soulspr, soulspr_end;
+extern char soulbluepal, soulbluepal_end;
+
 /*	Player Target_Init(x, y, speed);
 	Returns a target struct.
 x, y	;	Starting position.
@@ -18,11 +21,11 @@ s_objectData Target_Init(u8 x, u8 y, ufx speed, Level* lvl) {
 
     // Init OAM object.
     oamInitGfxSet(
-        PLAYER_SPRITES, PLAYER_SPRITES_SIZE,       // Sprites + Length
-        target.sData.palette, PLAYER_PALETTE_SIZE, // Palette + Length
-        PLAYER_PALETTE_BANK,                       // Palette Bank
-        MEM_SPRITES,                               // Where to put sprites.
-        SPR_SIZE_16x32                             // Size of sprites.
+        &soulspr, (&soulspr_end - &soulspr),
+        &soulbluepal, (&soulbluepal_end - &soulbluepal),
+        PLAYER_PALETTE_BANK+2,
+        0x5600,
+        SPR_SIZE_16x32
     );
 
     oamSet(target.sData.oamID, target.pData.scrX, target.pData.scrY, 3, 0, 0, 0, 0);
@@ -63,8 +66,9 @@ s_objectData Player_Init(u8 x, u8 y, ufx speed, Level* lvl) {
 	player.aData.curFrame = 0;
 	player.aData.sprState = 0;
 	player.aData.timePerFrame = 30;
-
-    oamInitGfxSet(
+	
+	// Init Bullet Sprites
+	oamInitGfxSet(
         &bulletspr, (&bulletspr_end - &bulletspr),
         &bulletbluepal, (&bulletbluepal_end - &bulletbluepal),
         PLAYER_PALETTE_BANK+1,

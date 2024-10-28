@@ -82,4 +82,12 @@ bulletbluepal:
 .incbin "res/AngelAngle/bullet_sprites_blue.pal"
 bulletbluepal_end:
 
+soulspr:
+.incbin "res/AngelAngle/soul_sprites.pic"
+soulspr_end:
+
+soulbluepal:
+.incbin "res/AngelAngle/soul_sprites_blue.pal"
+soulbluepal_end:
+
 .ends
