@@ -1,6 +1,122 @@
 #include "object_funcs.h"
 #include "sprite_tables.h"
 
+extern char sheepspr, sheepspr_end;
+extern char sheeppal, sheeppal_end;
+
+extern char bulletspr, bulletspr_end;
+extern char bulletbluepal, bulletbluepal_end;
+
+/*	Player Target_Init(x, y, speed);
+	Returns a target struct.
+x, y	;	Starting position.
+speed	;	Starting speed.
+*/
+s_objectData Target_Init(u8 x, u8 y, ufx speed, Level* lvl) {
+    // Init target.
+    s_objectData target = generic_init_obj(OBJECT_TARGET, x, y, speed, get_free_oamid(lvl), PLAYER_PALETTE, &target_tick, &target_draw);
+
+    // Init OAM object.
+    oamInitGfxSet(
+        PLAYER_SPRITES, PLAYER_SPRITES_SIZE,       // Sprites + Length
+        target.sData.palette, PLAYER_PALETTE_SIZE, // Palette + Length
+        PLAYER_PALETTE_BANK,                       // Palette Bank
+        MEM_SPRITES,                               // Where to put sprites.
+        SPR_SIZE_16x32                             // Size of sprites.
+    );
+
+    oamSet(target.sData.oamID, target.pData.scrX, target.pData.scrY, 3, 0, 0, 0, 0);
+    oamSetEx(target.sData.oamID, OBJ_SMALL, 1);
+    oamSetVisible(target.sData.oamID, OBJ_SHOW);
+
+    target.aData.sprState = 0;
+
+    return target;
+}
+
+
+// Functions
+/*	Player Player_Init(x, y, speed);
+	Returns a player struct.
+x, y	;	Starting position.
+speed	;	Starting speed.
+*/
+s_objectData Player_Init(u8 x, u8 y, ufx speed, Level* lvl) {
+    // Init player.
+    s_objectData player = generic_init_obj(OBJECT_PLAYER, x, y, speed, get_free_oamid(lvl), PLAYER_PALETTE, &player_tick, &player_draw);
+
+    // Init OAM object.
+    oamInitGfxSet(
+        PLAYER_SPRITES, PLAYER_SPRITES_SIZE,       // Sprites + Length
+        player.sData.palette, PLAYER_PALETTE_SIZE, // Palette + Length
+        PLAYER_PALETTE_BANK,                       // Palette Bank
+        MEM_SPRITES,                               // Where to put sprites.
+        SPR_SIZE_16x32                             // Size of sprites.
+    );
+
+    oamSet(player.sData.oamID, player.pData.scrX, player.pData.scrY, 3, 0, 0, 0, 0);
+    oamSetEx(player.sData.oamID, OBJ_SMALL, 1);
+    oamSetVisible(player.sData.oamID, OBJ_SHOW);
+	
+	// This should probably be modular but for now we'll hard code it.
+	player.aData.frameTimer = 0;
+	player.aData.curFrame = 0;
+	player.aData.sprState = 0;
+	player.aData.timePerFrame = 30;
+
+    oamInitGfxSet(
+        &bulletspr, (&bulletspr_end - &bulletspr),
+        &bulletbluepal, (&bulletbluepal_end - &bulletbluepal),
+        PLAYER_PALETTE_BANK+1,
+        0x5C00,
+        SPR_SIZE_16x16
+    );
+
+    return player;
+}
+
+// Functions
+/*	Player Player_Init(x, y, speed);
+	Returns a player struct.
+x, y	;	Starting position.
+speed	;	Starting speed.
+*/
+s_objectData Bullet_Init(u8 x, u8 y, sfx xSpeed, sfx ySpeed, Level* lvl) {
+    // Init player.
+    s_objectData bullet = generic_init_obj(OBJECT_BULLET, x, y, CharToUFX(1, 0), get_free_oamid(lvl), PLAYER_PALETTE, &bullet_tick, &bullet_draw);
+    bullet.pData.dX = xSpeed;
+    bullet.pData.dY = ySpeed;
+
+    oamSet(bullet.sData.oamID, bullet.pData.scrX, bullet.pData.scrY, 3, 0, 0, 0, 0);
+    oamSetEx(bullet.sData.oamID, OBJ_SMALL, 1);
+    oamSetVisible(bullet.sData.oamID, OBJ_SHOW);
+	
+	// This should probably be modular but for now we'll hard code it.
+	bullet.aData.frameTimer = 0;
+	bullet.aData.curFrame = 0;
+	bullet.aData.sprState = 0;
+	bullet.aData.timePerFrame = 30;
+
+    return bullet;
+}
+
+
+/*	Player Target_Init(x, y, speed);
+	Returns a collider object.
+x, y	        ;	Starting position.
+sizeX, sizeY	;	Size.
+*/
+s_objectData Collider_Init(u8 x, u8 y, u8 sizeX, u8 sizeY, Level* lvl) {
+    // Init collider.
+    s_objectData collider = generic_init_obj(OBJECT_COLLIDER, x, y, 0, 0, 0, NULL, NULL);
+
+    collider.pData.hitBoxSizeX = sizeX;
+    collider.pData.hitBoxSizeY = sizeY;
+    collider.aData.sprState = 0;
+
+    return collider;
+}
+
 void add_obj_to_lvl(s_objectData obj, Level *level) {
     u8 idx = get_free_obj_slot(level);
     level->data->objects[idx] = obj;
@@ -154,24 +270,28 @@ void player_tick(u16 pad0, s_objectData *player, Level* level) {
 
     if (pad0) { // If a button has been pressed.
         // Movement
-        if (pad0 & KEY_LEFT && !(collision_dirs & COLLISION_LEFT)){
+        if (pad0 & KEY_LEFT && !(collision_dirs & COLLISION_LEFT)) {
             player->pData.dX = -player->pData.speed;
-			player->aData.sprState = PS_SIDE;
-			player->sData.hFlip = 0;
-		}
-        if (pad0 & KEY_RIGHT && !(collision_dirs & COLLISION_RIGHT)){
-            player->pData.dX = player->pData.speed;
 			player->aData.sprState = PS_SIDE;
 			player->sData.hFlip = 1;
 		}
-        if (pad0 & KEY_UP && !(collision_dirs & COLLISION_UP)){
+        if (pad0 & KEY_RIGHT && !(collision_dirs & COLLISION_RIGHT)) {
+            player->pData.dX = player->pData.speed;
+			player->aData.sprState = PS_SIDE;
+			player->sData.hFlip = 0;
+		}
+        if (pad0 & KEY_UP && !(collision_dirs & COLLISION_UP)) {
             player->pData.dY = -player->pData.speed;
 			player->aData.sprState = PS_UP;
 		}
-        if (pad0 & KEY_DOWN && !(collision_dirs & COLLISION_DOWN)){
+        if (pad0 & KEY_DOWN && !(collision_dirs & COLLISION_DOWN)) {
 			player->pData.dY = player->pData.speed;
 			player->aData.sprState = PS_DOWN;
 		}
+
+        if(pad0 & KEY_Y) {
+            spawn_bullet(player, level);
+        }
 
         // Shooting
         // BIG BIG TODO
@@ -194,6 +314,22 @@ void player_tick(u16 pad0, s_objectData *player, Level* level) {
 	}
 }
 
+void spawn_bullet(s_objectData* obj, Level* lvl) {
+    if(obj->aData.sprState == PS_SIDE) {
+        if(obj->sData.hFlip == 0) {
+            Bullet_Init(obj->pData.scrX, obj->pData.scrY, CharToSFX(2, 5), CharToSFX(0, 0), lvl);
+        } else {
+            Bullet_Init(obj->pData.scrX, obj->pData.scrY, CharToSFX(-2, 5), CharToSFX(0, 0), lvl);
+        }
+    }
+    if(obj->aData.sprState == PS_UP) {
+        Bullet_Init(obj->pData.scrX, obj->pData.scrY, CharToSFX(0, 0), CharToSFX(2, 5), lvl);
+    }
+    if(obj->aData.sprState == PS_DOWN) {
+        Bullet_Init(obj->pData.scrX, obj->pData.scrY, CharToSFX(0, 0), CharToSFX(-2, 5), lvl);
+    }
+}
+
 void player_draw(s_objectData *player) {
     //generic_draw(player);
 	
@@ -212,11 +348,27 @@ void target_tick(u16 pad0, s_objectData *target, Level* level) {
     target->pData.scrX = SFXToChar(target->pData.wX);
     target->pData.scrY = SFXToChar(target->pData.wY);
 
-    target->sData.visible = CheckCollision_obj_obj(&level->data->objects[0], target) & 1;
+    target->sData.visible = 1;//CheckCollision_obj_obj(&level->data->objects[0], target) & 1;
 }
 
 void target_draw(s_objectData *target) {
     generic_draw(target);
+}
+
+void bullet_tick(u16 pad0, s_objectData *bullet, Level* level) {
+    u8 collision_dirs = Collide_obj_colliders(bullet, level);
+
+    //if(collision_dirs & 1 > 0) bullet->aData.sprState = 255;
+
+    bullet->pData.wX += bullet->pData.dX;
+    bullet->pData.wY += bullet->pData.dY;
+
+    bullet->pData.scrX = SFXToChar(bullet->pData.wX);
+    bullet->pData.scrY = SFXToChar(bullet->pData.wY);
+}
+
+void bullet_draw(s_objectData *bullet) {
+    // generic_draw(bullet);
 }
 
 void generic_draw(s_objectData *object) {
