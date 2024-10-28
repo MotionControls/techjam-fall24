@@ -5,7 +5,7 @@
 // The way these tables work is that each value represents a point in memory from the OAM tileset.
 // Each value should point towards the top-left corner of a given sprite.
 // The location of each sprite (after loading) can be easily seen through something like Mesen.
-const u8 playerSpriteTable[55] = {
+const u16 playerSpriteTable[43] = {
     // Walking + Idle
 	0x0,0x2,0x0,0x2,	// Down, Flip last frame
 	0x4,0x6,0x4,0x6,	// Up, Flip last frame
@@ -20,7 +20,7 @@ const u8 playerSpriteTable[55] = {
 	0x5040,0x5060,0x5080,0x50A0,0x50C0
 };
 
-const u8 soulSpriteTable[17] = {
+const u16 soulSpriteTable[16] = {
 	// Idle
 	0x5A00,0x5620,
 	
@@ -28,6 +28,10 @@ const u8 soulSpriteTable[17] = {
 	0x5640,0x5660,0x5680,0x56A0,0x56C0,0x56E0,
 	0x5A00,0x5A20,0x5A40,0x5A60,0x5A80,0x5AA0,
 	0x5AC0,0x5AE0
+};
+
+const u16 bulletSpriteTable[6] = {
+	0x5400,0x5420,0x5440,0x5460,0x5480,0x54A0
 };
 
 // Structs
