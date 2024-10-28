@@ -86,6 +86,7 @@ s_objectData Bullet_Init(u8 x, u8 y, sfx xSpeed, sfx ySpeed, Level* lvl) {
     s_objectData bullet = generic_init_obj(OBJECT_BULLET, x, y, CharToUFX(1, 0), get_free_oamid(lvl), PLAYER_PALETTE, &bullet_tick, &bullet_draw);
     bullet.pData.dX = xSpeed;
     bullet.pData.dY = ySpeed;
+    bullet.pData.hitBoxSizeY = 16;
 
     oamSet(bullet.sData.oamID, bullet.pData.scrX, bullet.pData.scrY, 3, 0, 0, 0, 0);
     oamSetEx(bullet.sData.oamID, OBJ_SMALL, 1);
@@ -115,6 +116,13 @@ s_objectData Collider_Init(u8 x, u8 y, u8 sizeX, u8 sizeY, Level* lvl) {
     collider.aData.sprState = 0;
 
     return collider;
+}
+
+void obj_kill(s_objectData* obj) {
+    obj->aData.sprState = 255;
+    oamSetVisible(obj->sData.oamID, OBJ_HIDE);
+    obj->draw_ptr = NULL;
+    obj->update_ptr = NULL;
 }
 
 void add_obj_to_lvl(s_objectData obj, Level *level) {
@@ -235,7 +243,29 @@ u8 Collide_obj_colliders(s_objectData* obj, Level* lvl) {
             ++i;
             continue;
         }
-        collision_dirs |= col_res >> 8;  
+        collision_dirs |= col_res >> 8;
+        collision_dirs |= 1 << 7;  
+        ++i;
+    }
+    return collision_dirs;
+}
+
+u8 Collide_obj_bullets(s_objectData* obj, Level* lvl) {
+    u8 collision_dirs = 0;
+    u8 i = 0;
+    while(i < LEVEL_MAX_OBJECTS) {
+        if(lvl->data->objects[i].aData.sprState == 255 || 
+        lvl->data->objects[i].objID != OBJECT_BULLET) {
+            ++i;
+            continue;
+        }
+        u16 col_res = CheckCollision_obj_obj(obj, &lvl->data->objects[i]);
+        if(col_res & 1 == 0) {
+            ++i;
+            continue;
+        }
+        collision_dirs |= col_res >> 8;
+        collision_dirs |= 1 << 7;  
         ++i;
     }
     return collision_dirs;
@@ -289,14 +319,19 @@ void player_tick(u16 pad0, s_objectData *player, Level* level) {
 			player->aData.sprState = PS_DOWN;
 		}
 
-        if(pad0 & KEY_Y) {
+        if(pad0 & KEY_Y && player->pData.b == 0) {
             spawn_bullet(player, level);
+            player->pData.b = 16;
         }
 
         // Shooting
         // BIG BIG TODO
 		
 		player->aData.frameTimer++;
+    }
+
+    if(player->pData.b > 0) {
+        --player->pData.b;
     }
 
     player->pData.wX += player->pData.dX;
@@ -317,16 +352,16 @@ void player_tick(u16 pad0, s_objectData *player, Level* level) {
 void spawn_bullet(s_objectData* obj, Level* lvl) {
     if(obj->aData.sprState == PS_SIDE) {
         if(obj->sData.hFlip == 0) {
-            Bullet_Init(obj->pData.scrX, obj->pData.scrY, CharToSFX(2, 5), CharToSFX(0, 0), lvl);
+            add_obj_to_lvl(Bullet_Init(obj->pData.scrX, obj->pData.scrY, CharToSFX(1, 0), CharToSFX(0, 0), lvl), lvl);
         } else {
-            Bullet_Init(obj->pData.scrX, obj->pData.scrY, CharToSFX(-2, 5), CharToSFX(0, 0), lvl);
+            add_obj_to_lvl(Bullet_Init(obj->pData.scrX, obj->pData.scrY, CharToSFX(-1, 0), CharToSFX(0, 0), lvl), lvl);
         }
     }
     if(obj->aData.sprState == PS_UP) {
-        Bullet_Init(obj->pData.scrX, obj->pData.scrY, CharToSFX(0, 0), CharToSFX(2, 5), lvl);
+        add_obj_to_lvl(Bullet_Init(obj->pData.scrX, obj->pData.scrY, CharToSFX(0, 0), CharToSFX(-1, 0), lvl), lvl);
     }
     if(obj->aData.sprState == PS_DOWN) {
-        Bullet_Init(obj->pData.scrX, obj->pData.scrY, CharToSFX(0, 0), CharToSFX(-2, 5), lvl);
+        add_obj_to_lvl(Bullet_Init(obj->pData.scrX, obj->pData.scrY, CharToSFX(0, 0), CharToSFX(1, 0), lvl), lvl);
     }
 }
 
@@ -340,7 +375,12 @@ void player_draw(s_objectData *player) {
 }
 
 void target_tick(u16 pad0, s_objectData *target, Level* level) {
-    // target->pData.dX = target->pData.dY = 100;
+    u8 collision_dirs = Collide_obj_bullets(target, level);
+
+    if((collision_dirs & 0b1111) > 0) {
+        obj_kill(target);
+        return;
+    }
 
     target->pData.wX += target->pData.dX;
     target->pData.wY += target->pData.dY;
@@ -356,9 +396,12 @@ void target_draw(s_objectData *target) {
 }
 
 void bullet_tick(u16 pad0, s_objectData *bullet, Level* level) {
-    //u8 collision_dirs = Collide_obj_colliders(bullet, level);
+    u8 collision_dirs = Collide_obj_colliders(bullet, level);
 
-    // if(collision_dirs & 1 > 0) bullet->aData.sprState = 255;
+    if((collision_dirs & 0b1111) > 0) {
+        obj_kill(bullet);
+        return;
+    }
 
     bullet->pData.wX += bullet->pData.dX;
     bullet->pData.wY += bullet->pData.dY;

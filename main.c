@@ -47,6 +47,8 @@ void Level_Tick(u16 pad0, Level *level);
 void BG_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8 *map, u16 mapSize, u16 mapMem);
 void TLD_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8* tldMap, u8* tldTiles, u8* tldProps, u8 mapTileSize);
 
+u8 level_num = 0;
+
 int main(void) {
     // Init SNES
     // consoleInit();
@@ -59,7 +61,7 @@ int main(void) {
     // The OAM can only be used AFTER consoleInit so this should be done afterwards.
     //    s_objectData player = Player_Init(100, 100, CharToUFX(1, 0));
     //    s_objectData target = Target_Init(100, 100, CharToUFX(0, 0));
-    cur_level = Level_Init(1);
+    cur_level = Level_Init(0);
 
     //Init BG stuffs.
 	/*
@@ -114,14 +116,20 @@ int main(void) {
 
 void Level_Tick(u16 pad0, Level *level) {
     u8 i = 0;
+    u8 num_targets = 0;
     while(i < LEVEL_MAX_OBJECTS) {
         if(level->data->objects[i].aData.sprState == 255) {
             ++i;
             continue;
         }
+        if(level->data->objects[i].objID == OBJECT_TARGET) ++num_targets;
         if(level->data->objects[i].update_ptr) (*level->data->objects[i].update_ptr)(pad0, &level->data->objects[i], level);
         if(level->data->objects[i].draw_ptr) (*level->data->objects[i].draw_ptr)(&level->data->objects[i]);
         ++i;
+    }
+    if(num_targets == 0) {
+        ++level_num;
+        cur_level = Level_Init(level_num);
     }
 }
 

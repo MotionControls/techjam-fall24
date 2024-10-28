@@ -26,9 +26,11 @@ void clear_lvl_objs(Level *level);
 u8 get_free_oamid(Level*);
 u8 get_free_obj_slot(Level*);
 void spawn_bullet(s_objectData* obj, Level* lvl);
+void obj_kill(s_objectData* obj);
 
 u16 CheckCollision_obj_obj(s_objectData *objA, s_objectData *objB);
 u8 Collide_obj_colliders(s_objectData* obj, Level* lvl);
+u8 Collide_obj_bullets(s_objectData* obj, Level* lvl);
 
 s_objectData generic_init_obj(u8 id,
     u8 x, u8 y, 
