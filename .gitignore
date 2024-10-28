@@ -12,3 +12,9 @@ linkfile
 # Ignore Metype's weird IDE config files
 .fleet
 .vscode
+
+# Ignore most of the resources for the game.
+res/AngelAngle/Sheep/
+res/AngelAngle/Shots
+res/AngelAngle/Souls
+res/AngelAngle/Tiles
