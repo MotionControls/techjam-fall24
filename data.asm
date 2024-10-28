@@ -74,4 +74,12 @@ sheeppal:
 .incbin "res/AngelAngle/sheep_sprites.pal"
 sheeppal_end:
 
+bulletspr:
+.incbin "res/AngelAngle/bullet_sprites.pic"
+bulletspr_end:
+
+bulletbluepal:
+.incbin "res/AngelAngle/bullet_sprites_blue.pal"
+bulletbluepal_end:
+
 .ends

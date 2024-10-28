@@ -6,11 +6,14 @@
 #include "level_defs.h"
 
 // Sprites
-extern char sheepspr, sheepspr_end;
-extern char sheeppal, sheeppal_end;
+extern char johnspr, sheepspr_end;
+extern char johnpal, johnpal_end;
 
 extern char sheepspr, sheepspr_end;
 extern char sheeppal, sheeppal_end;
+
+extern char bulletspr, bulletspr_end;
+extern char bulletbluepal, bulletbluepal_end;
 
 // BGs
 extern char iconsbg, iconsbg_end;
@@ -220,6 +223,15 @@ s_objectData Player_Init(u8 x, u8 y, ufx speed, Level* lvl) {
 	player.aData.curFrame = 0;
 	player.aData.sprState = 0;
 	player.aData.timePerFrame = 30;
+	
+	// Init Bullet Sprites.
+	oamInitGfxSet(
+        &bulletspr, (&bulletspr_end - &bulletspr),
+        &bulletbluepal, (&bulletbluepal_end - &bulletbluepal),
+        PLAYER_PALETTE_BANK+1,
+        0x5C00,
+        SPR_SIZE_16x16
+    );
 
     return player;
 }
