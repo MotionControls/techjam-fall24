@@ -89,7 +89,7 @@ int main(void) {
     // The OAM can only be used AFTER consoleInit so this should be done afterwards.
     //    s_objectData player = Player_Init(100, 100, CharToUFX(1, 0));
     //    s_objectData target = Target_Init(100, 100, CharToUFX(0, 0));
-    cur_level = Level_Init(0);
+    cur_level = Level_Init(1);
 
     //Init BG stuffs.
 	/*

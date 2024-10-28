@@ -63,6 +63,11 @@ u16 CheckCollision_obj_obj(s_objectData *objA, s_objectData *objB) {
     u16 objBRight = objBLeft + objB->pData.hitBoxSizeX;
     u16 objBBottom = objBTop + objB->pData.hitBoxSizeY;
 
+    // if(objALeft > objBRight) goto finish_collision;
+    // if(objATop > objBBottom) goto finish_collision;
+    // if(objARight < objBLeft) goto finish_collision;
+    // if(objABottom < objBTop) goto finish_collision;
+
     if (objALeft < objBRight && objARight > objBLeft && objATop < objBBottom && objABottom > objBTop) {
         collision_result |= 1;
         collision_result |= (objB->objID & 0b1111111) << 1;

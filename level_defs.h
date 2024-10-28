@@ -13,7 +13,7 @@ typedef struct {
     s_objDef objects[LEVEL_MAX_OBJECTS];
 } s_levelDef;
 
-s_levelDef levelDefs[1] = {
+s_levelDef levelDefs[3] = {
     {
         {
             {
@@ -45,6 +45,156 @@ s_levelDef levelDefs[1] = {
                 OBJECT_COLLIDER,
                 144, 80, 
                 16, 48
+            },
+            {-1}
+        }
+    },
+    {
+        {
+            {
+                OBJECT_PLAYER,
+                64, 48,
+                0, 0
+            },
+            {
+                OBJECT_TARGET,
+                176, 48,
+                0, 0
+            },
+            {
+                OBJECT_TARGET,
+                176, 160,
+                0, 0
+            },
+            {
+                OBJECT_TARGET,
+                64, 160,
+                0, 0
+            },
+            {
+                OBJECT_COLLIDER,
+                48, 32, 
+                64, 16
+            },
+            {
+                OBJECT_COLLIDER,
+                96, 48, 
+                64, 16
+            },
+            {
+                OBJECT_COLLIDER,
+                144, 32, 
+                64, 16
+            },
+            {
+                OBJECT_COLLIDER,
+                48, 48, 
+                16, 144
+            },
+            {
+                OBJECT_COLLIDER,
+                192, 48, 
+                16, 144
+            },
+            {
+                OBJECT_COLLIDER,
+                144, 192, 
+                64, 16
+            },
+            {
+                OBJECT_COLLIDER,
+                96, 176, 
+                64, 16
+            },
+            {
+                OBJECT_COLLIDER,
+                48, 192, 
+                64, 16
+            },
+            {
+                OBJECT_COLLIDER,
+                96, 128, 
+                64, 16
+            },
+            {
+                OBJECT_COLLIDER,
+                96, 96, 
+                64, 16
+            },
+            {-1}
+        }
+    },
+    {
+        {
+            {
+                OBJECT_PLAYER,
+                64, 48,
+                0, 0
+            },
+            {
+                OBJECT_TARGET,
+                176, 48,
+                0, 0
+            },
+            {
+                OBJECT_TARGET,
+                176, 160,
+                0, 0
+            },
+            {
+                OBJECT_TARGET,
+                64, 160,
+                0, 0
+            },
+            {
+                OBJECT_COLLIDER,
+                48, 32, 
+                64, 16
+            },
+            {
+                OBJECT_COLLIDER,
+                96, 48, 
+                64, 16
+            },
+            {
+                OBJECT_COLLIDER,
+                144, 32, 
+                64, 16
+            },
+            {
+                OBJECT_COLLIDER,
+                48, 48, 
+                16, 144
+            },
+            {
+                OBJECT_COLLIDER,
+                192, 48, 
+                16, 144
+            },
+            {
+                OBJECT_COLLIDER,
+                144, 192, 
+                64, 16
+            },
+            {
+                OBJECT_COLLIDER,
+                96, 176, 
+                64, 16
+            },
+            {
+                OBJECT_COLLIDER,
+                48, 192, 
+                64, 16
+            },
+            {
+                OBJECT_COLLIDER,
+                96, 128, 
+                64, 16
+            },
+            {
+                OBJECT_COLLIDER,
+                96, 96, 
+                64, 16
             },
             {-1}
         }
