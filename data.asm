@@ -60,3 +60,18 @@ snespal:
 .incbin "res/pvsneslibfont.pal"
 
 .ends
+
+.section ".rodata2" superfree
+
+;;;;;;;;;;;
+; Sprites ;
+;;;;;;;;;;;
+sheepspr:
+.incbin "res/AngelAngle/sheep_sprites.pic"
+sheepspr_end:
+
+sheeppal:
+.incbin "res/AngelAngle/sheep_sprites.pal"
+sheeppal_end:
+
+.ends

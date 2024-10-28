@@ -24,6 +24,10 @@ john.pic: res/johnplaceholder2.bmp
 	@echo convert bitmap ... $(notdir $@)
 	$(GFXCONV) -s 32 -o 16 -u 16 -t bmp -i $<
 
+sheep.pic: res/AngelAngle/sheep_sprites.png
+	@echo convert bitmap ... $(notdir $@)
+	$(GFXCONV) -s 32 -o 16 -u 16 -i $<
+
 # BACKGROUNDS
 bg_icons.pic: res/bg_icons.bmp
 	@echo convert bmp ... $(notdir $@)
@@ -38,4 +42,4 @@ tiled_test.m16: res/tiled_test.tmj tiled_testset.pic
 	@echo convert map tiled ... $(notdir $@)
 	$(TMXCONV) $< res/tiled_testset.map
 
-bitmaps : john.pic bg_icons.pic tiled_test.m16 tiled_testset.pic
+bitmaps : john.pic bg_icons.pic tiled_test.m16 tiled_testset.pic sheep.pic

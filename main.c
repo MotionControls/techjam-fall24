@@ -6,8 +6,11 @@
 #include "level_defs.h"
 
 // Sprites
-extern char johnspr, johnspr_end;
-extern char johnpal, johnpal_end;
+extern char sheepspr, sheepspr_end;
+extern char sheeppal, sheeppal_end;
+
+extern char sheepspr, sheepspr_end;
+extern char sheeppal, sheeppal_end;
 
 // BGs
 extern char iconsbg, iconsbg_end;
@@ -43,19 +46,19 @@ extern char snesfont, snespal;
 #define PLAYER_OAMID 0 // This is ideally the ONLY OAM that should be const.
 #define PLAYER_HORT 16
 #define PLAYER_VERT 32
-#define PLAYER_SPRITES &johnspr
-#define PLAYER_SPRITES_SIZE (&johnspr_end - &johnspr)
-#define PLAYER_PALETTE &johnpal
-#define PLAYER_PALETTE_SIZE (&johnpal_end - &johnpal)
+#define PLAYER_SPRITES &sheepspr
+#define PLAYER_SPRITES_SIZE (&sheepspr_end - &sheepspr)
+#define PLAYER_PALETTE &sheeppal
+#define PLAYER_PALETTE_SIZE (&sheeppal_end - &sheeppal)
 #define PLAYER_PALETTE_BANK 0
 
 // Bullet Stuffs
 #define BULLET_MAX_BULLETS 3
 #define BULLET_HORT 8
 #define BULLET_VERT 8
-#define BULLET_SPRITES &johnspr
-#define BULLET_SPRITES_SIZE (&johnspr_end - &johnspr)
-#define BULLET_PALETTE_SIZE (&johnpal_end - &johnpal) // The bullet palette cannot be const due to the colors of the bullet changing.
+#define BULLET_SPRITES &sheepspr
+#define BULLET_SPRITES_SIZE (&sheepspr_end - &sheepspr)
+#define BULLET_PALETTE_SIZE (&sheeppal_end - &sheeppal) // The bullet palette cannot be const due to the colors of the bullet changing.
                                                       // The size of the palette SHOULD remain constant.
 
 // BG Stuffs
