@@ -159,6 +159,91 @@ Level Level_Init(u8 id) {
     return loaded_level;
 }
 
+// Functions
+/*	Player Player_Init(x, y, speed);
+	Returns a player struct.
+x, y	;	Starting position.
+speed	;	Starting speed.
+*/
+s_objectData Player_Init(u8 x, u8 y, ufx speed, Level* lvl) {
+    // Init player.
+    s_objectData player = generic_init_obj(OBJECT_PLAYER, x, y, speed, get_free_oamid(lvl), PLAYER_PALETTE, &player_tick, &player_draw);
+
+    // Init OAM object.
+    oamInitGfxSet(
+        PLAYER_SPRITES, PLAYER_SPRITES_SIZE,       // Sprites + Length
+        player.sData.palette, PLAYER_PALETTE_SIZE, // Palette + Length
+        PLAYER_PALETTE_BANK,                       // Palette Bank
+        MEM_SPRITES,                               // Where to put sprites.
+        SPR_SIZE_16x32                             // Size of sprites.
+    );
+
+    oamSet(player.sData.oamID, player.pData.scrX, player.pData.scrY, 3, 0, 0, 0, 0);
+    oamSetEx(player.sData.oamID, OBJ_SMALL, 1);
+    oamSetVisible(player.sData.oamID, OBJ_SHOW);
+	
+	// This should probably be modular but for now we'll hard code it.
+	player.aData.frameTimer = 0;
+	player.aData.curFrame = 0;
+	player.aData.sprState = 0;
+	player.aData.timePerFrame = 30;
+	
+	// Init Bullet Sprites.
+	oamInitGfxSet(
+        &bulletspr, (&bulletspr_end - &bulletspr),
+        &bulletbluepal, (&bulletbluepal_end - &bulletbluepal),
+        PLAYER_PALETTE_BANK+1,
+        0x5400,
+        SPR_SIZE_16x16
+    );
+
+    return player;
+}
+
+
+/*	Player Target_Init(x, y, speed);
+	Returns a target struct.
+x, y	;	Starting position.
+speed	;	Starting speed.
+*/
+s_objectData Target_Init(u8 x, u8 y, ufx speed, Level* lvl) {
+    // Init target.
+    s_objectData target = generic_init_obj(OBJECT_TARGET, x, y, speed, get_free_oamid(lvl), PLAYER_PALETTE, &target_tick, &target_draw);
+
+    // Init OAM object.
+    oamInitGfxSet(
+        PLAYER_SPRITES, PLAYER_SPRITES_SIZE,       // Sprites + Length
+        target.sData.palette, PLAYER_PALETTE_SIZE, // Palette + Length
+        PLAYER_PALETTE_BANK,                       // Palette Bank
+        MEM_SPRITES,                               // Where to put sprites.
+        SPR_SIZE_16x32                             // Size of sprites.
+    );
+
+    oamSet(target.sData.oamID, target.pData.scrX, target.pData.scrY, 3, 0, 0, 0, 0);
+    oamSetEx(target.sData.oamID, OBJ_SMALL, 1);
+    oamSetVisible(target.sData.oamID, OBJ_SHOW);
+
+    target.aData.sprState = 0;
+
+    return target;
+}
+
+/*	Player Target_Init(x, y, speed);
+	Returns a collider object.
+x, y	        ;	Starting position.
+sizeX, sizeY	;	Size.
+*/
+s_objectData Collider_Init(u8 x, u8 y, u8 sizeX, u8 sizeY, Level* lvl) {
+    // Init collider.
+    s_objectData collider = generic_init_obj(OBJECT_COLLIDER, x, y, 0, 0, 0, NULL, NULL);
+
+    collider.pData.hitBoxSizeX = sizeX;
+    collider.pData.hitBoxSizeY = sizeY;
+    collider.aData.sprState = 0;
+
+    return collider;
+}
+
 /*	void BG_Change(index, tiles, tilesSize, palette, paletteSize, paletteBank, tileMem, map, mapSize, mapMem);
 	Changes the background at index.
 index		;	Index of the background to change.
