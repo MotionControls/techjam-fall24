@@ -348,11 +348,18 @@ void player_tick(u16 pad0, s_objectData *player, Level* level) {
             player->pData.dX = -player->pData.speed;
 			player->aData.sprState = PS_SIDE;
 			player->sData.hFlip = 1;
+			
+			// wwwwWWWWWWWWWWWWWWAITER
+			// more band-aid fixes please.
+			if(player->aData.curFrame > 1)
+				player->aData.curFrame = 0;
 		}
         if (pad0 & KEY_RIGHT && !(collision_dirs & COLLISION_RIGHT)) {
             player->pData.dX = player->pData.speed;
 			player->aData.sprState = PS_SIDE;
 			player->sData.hFlip = 0;
+			if(player->aData.curFrame > 1)
+				player->aData.curFrame = 0;
 		}
         if (pad0 & KEY_UP && !(collision_dirs & COLLISION_UP)) {
             player->pData.dY = -player->pData.speed;
@@ -388,8 +395,20 @@ void player_tick(u16 pad0, s_objectData *player, Level* level) {
 	if(player->aData.frameTimer > player->aData.timePerFrame){
 		player->aData.frameTimer = 0;
 		
-		// Maybe make the max possible frame a var in aData?
-		player->aData.curFrame = (player->aData.curFrame == 2) ? 0 : player->aData.curFrame + 1;
+		u8 maxFrame;
+		switch(player->aData.sprState){
+			default:
+				maxFrame = 3;
+			break;
+			case PS_SIDE:
+				maxFrame = 1;
+			break;
+		}
+		
+		if((player->aData.sprState == PS_UP || player->aData.sprState == PS_DOWN) && player->aData.curFrame % 2 == 0)
+			player->sData.hFlip = !player->sData.hFlip;
+		
+		player->aData.curFrame = (player->aData.curFrame == maxFrame) ? 0 : player->aData.curFrame + 1;
 	}
 }
 
@@ -436,7 +455,10 @@ void target_tick(u16 pad0, s_objectData *target, Level* level) {
 }
 
 void target_draw(s_objectData *target) {
-    generic_draw(target);
+    //generic_draw(target);
+	
+	oamSetVisible(target->sData.oamID, target->sData.visible ? OBJ_SHOW : OBJ_HIDE);
+    oamSet(target->sData.oamID, target->pData.scrX, target->pData.scrY, 3, target->sData.hFlip, target->sData.vFlip, soulSpriteTable[target->aData.curFrame + target->aData.sprState], 2);
 }
 
 void bullet_tick(u16 pad0, s_objectData *bullet, Level* level) {
