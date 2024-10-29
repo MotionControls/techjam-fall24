@@ -20,6 +20,7 @@ s_objectData Target_Init(u8 x, u8 y, ufx speed, u8 eBits, Level* lvl);
 s_objectData Player_Init(u8 x, u8 y, ufx speed, u8 eBits, Level* lvl);
 s_objectData Bullet_Init(u8 x, u8 y, sfx xSpeed, sfx ySpeed, u8 eBits, Level* lvl);
 s_objectData Collider_Init(u8 x, u8 y, u8 sizeX, u8 sizeY, u8 eBits, Level* lvl);
+s_objectData Angle_Init(u8 x, u8 y, u8 eBits, Level* lvl);
 
 void add_obj_to_lvl(s_objectData obj, Level *level);
 void clear_lvl_objs(Level *level);
@@ -30,6 +31,7 @@ void obj_kill(s_objectData* obj);
 
 u16 CheckCollision_obj_obj(s_objectData *objA, s_objectData *objB);
 u8 Collide_obj_colliders(s_objectData* obj, Level* lvl);
+u8 Collide_obj_angles(s_objectData* obj, Level* lvl);
 u8 Collide_obj_bullets(s_objectData* obj, Level* lvl);
 
 s_objectData generic_init_obj(u8 id,

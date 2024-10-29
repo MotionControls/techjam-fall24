@@ -44,7 +44,7 @@ void Level_Tick(u16 pad0, Level *level);
 void BG_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8 *map, u16 mapSize, u16 mapMem);
 void TLD_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8* tldMap, u8* tldTiles, u8* tldProps, u8 mapTileSize);
 
-u8 level_num = 0;
+u8 level_num = 4;
 
 int main(void) {
     // Init SNES
@@ -58,7 +58,7 @@ int main(void) {
     // The OAM can only be used AFTER consoleInit so this should be done afterwards.
     //    s_objectData player = Player_Init(100, 100, CharToUFX(1, 0));
     //    s_objectData target = Target_Init(100, 100, CharToUFX(0, 0));
-    cur_level = Level_Init(0);
+    cur_level = Level_Init(level_num);
 
     //Init BG stuffs.
 	/*
@@ -130,6 +130,23 @@ void Level_Tick(u16 pad0, Level *level) {
     }
 }
 
+void handle_obj(s_objDef objDef, Level* lvl) {
+    switch(objDef.id) {
+            case OBJECT_PLAYER:
+                add_obj_to_lvl(Player_Init(objDef.x, objDef.y, CharToUFX(1, 0), objDef.extra_bits, lvl), lvl);
+                break;
+            case OBJECT_TARGET:
+                add_obj_to_lvl(Target_Init(objDef.x, objDef.y, CharToUFX(1, 0), objDef.extra_bits, lvl), lvl);
+                break;
+            case OBJECT_COLLIDER:
+                add_obj_to_lvl(Collider_Init(objDef.x, objDef.y, objDef.sizeX, objDef.sizeY, objDef.extra_bits, lvl), lvl);
+                break;
+            case OBJECT_ANGLE:
+                add_obj_to_lvl(Angle_Init(objDef.x, objDef.y, objDef.extra_bits, lvl), lvl);
+                break;
+        }
+}
+
 Level Level_Init(u8 id) {
     u8 curObjID = 0;
     Level loaded_level = {
@@ -148,17 +165,7 @@ Level Level_Init(u8 id) {
     while(i < LEVEL_MAX_OBJECTS) {
         s_objDef objDef = levelDefs[id].objects[i];
         if(objDef.id  == (u8)-1) break;
-        switch(objDef.id) {
-            case OBJECT_PLAYER:
-                add_obj_to_lvl(Player_Init(objDef.x, objDef.y, CharToUFX(1, 0), objDef.extra_bits, &loaded_level), &loaded_level);
-                break;
-            case OBJECT_TARGET:
-                add_obj_to_lvl(Target_Init(objDef.x, objDef.y, CharToUFX(1, 0), objDef.extra_bits, &loaded_level), &loaded_level);
-                break;
-            case OBJECT_COLLIDER:
-                add_obj_to_lvl(Collider_Init(objDef.x, objDef.y, objDef.sizeX, objDef.sizeY, objDef.extra_bits, &loaded_level), &loaded_level);
-                break;
-        }
+        handle_obj(objDef, &loaded_level);
         ++i;
     }
     return loaded_level;

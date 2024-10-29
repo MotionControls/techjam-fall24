@@ -40,6 +40,7 @@ typedef enum {
   OBJECT_TARGET = 1,
   OBJECT_COLLIDER = 2,
   OBJECT_BULLET = 3,
+  OBJECT_ANGLE = 4,
 } e_objectID;
 
 typedef struct {

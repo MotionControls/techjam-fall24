@@ -127,6 +127,18 @@ s_objectData Collider_Init(u8 x, u8 y, u8 sizeX, u8 sizeY, u8 eBits, Level* lvl)
     return collider;
 }
 
+s_objectData Angle_Init(u8 x, u8 y, u8 eBits, Level* lvl) {
+    // Init collider.
+    s_objectData angle = generic_init_obj(OBJECT_ANGLE, x, y, 0, 0, 0, NULL, NULL);
+
+    angle.pData.hitBoxSizeX = 16;
+    angle.pData.hitBoxSizeY = 16; 
+    angle.aData.sprState = 0;
+    angle.pData.eBits = eBits;
+
+    return angle;
+}
+
 void obj_kill(s_objectData* obj) {
     obj->aData.sprState = 255;
     oamSetVisible(obj->sData.oamID, OBJ_HIDE);
@@ -246,6 +258,27 @@ u8 Collide_obj_colliders(s_objectData* obj, Level* lvl) {
     while(i < LEVEL_MAX_OBJECTS) {
         if(lvl->data->objects[i].aData.sprState == 255 || 
         lvl->data->objects[i].objID != OBJECT_COLLIDER) {
+            ++i;
+            continue;
+        }
+        u16 col_res = CheckCollision_obj_obj(obj, &lvl->data->objects[i]);
+        if(col_res & 1 == 0) {
+            ++i;
+            continue;
+        }
+        collision_dirs |= col_res >> 8;
+        collision_dirs |= 1 << 7;  
+        ++i;
+    }
+    return collision_dirs;
+}
+
+u8 Collide_obj_angles(s_objectData* obj, Level* lvl) {
+    u8 collision_dirs = 0;
+    u8 i = 0;
+    while(i < LEVEL_MAX_OBJECTS) {
+        if(lvl->data->objects[i].aData.sprState == 255 || 
+        lvl->data->objects[i].objID != OBJECT_ANGLE) {
             ++i;
             continue;
         }
@@ -415,6 +448,19 @@ void bullet_tick(u16 pad0, s_objectData *bullet, Level* level) {
     if((collision_dirs & 0b1111) > 0) {
         obj_kill(bullet);
         return;
+    }
+
+    collision_dirs = Collide_obj_angles(bullet, level);
+    u8 angle = (collision_dirs & 0b01110000) >> 4;
+    if((collision_dirs & 0b1111) > 0) {
+        if(angle == 0 && bullet->pData.dX > 0) {
+            bullet->pData.dY = bullet->pData.dX;
+            bullet->pData.dX = 0;
+        }
+        // if(angle == 1 && bullet->pData.dX > 0) {
+        //     bullet->pData.dY = bullet->pData.dX;
+        //     bullet->pData.dX = 0;
+        // }
     }
 
     bullet->pData.wX += bullet->pData.dX;
