@@ -15,9 +15,11 @@ extern char soulbluepal, soulbluepal_end;
 x, y	;	Starting position.
 speed	;	Starting speed.
 */
-s_objectData Target_Init(u8 x, u8 y, ufx speed, Level* lvl) {
+s_objectData Target_Init(u8 x, u8 y, ufx speed, u8 eBits, Level* lvl) {
     // Init target.
     s_objectData target = generic_init_obj(OBJECT_TARGET, x, y, speed, get_free_oamid(lvl), PLAYER_PALETTE, &target_tick, &target_draw);
+
+    target.pData.eBits = eBits;
 
     // Init OAM object.
     oamInitGfxSet(
@@ -44,7 +46,7 @@ s_objectData Target_Init(u8 x, u8 y, ufx speed, Level* lvl) {
 x, y	;	Starting position.
 speed	;	Starting speed.
 */
-s_objectData Player_Init(u8 x, u8 y, ufx speed, Level* lvl) {
+s_objectData Player_Init(u8 x, u8 y, ufx speed, u8 eBits, Level* lvl) {
     // Init player.
     s_objectData player = generic_init_obj(OBJECT_PLAYER, x, y, speed, get_free_oamid(lvl), PLAYER_PALETTE, &player_tick, &player_draw);
 
@@ -66,6 +68,7 @@ s_objectData Player_Init(u8 x, u8 y, ufx speed, Level* lvl) {
 	player.aData.curFrame = 0;
 	player.aData.sprState = 0;
 	player.aData.timePerFrame = 30;
+    player.pData.eBits = eBits;
 	
 	// Init Bullet Sprites
 	oamInitGfxSet(
@@ -85,12 +88,13 @@ s_objectData Player_Init(u8 x, u8 y, ufx speed, Level* lvl) {
 x, y	;	Starting position.
 speed	;	Starting speed.
 */
-s_objectData Bullet_Init(u8 x, u8 y, sfx xSpeed, sfx ySpeed, Level* lvl) {
+s_objectData Bullet_Init(u8 x, u8 y, sfx xSpeed, sfx ySpeed, u8 eBits, Level* lvl) {
     // Init player.
     s_objectData bullet = generic_init_obj(OBJECT_BULLET, x, y, CharToUFX(1, 0), get_free_oamid(lvl), PLAYER_PALETTE, &bullet_tick, &bullet_draw);
     bullet.pData.dX = xSpeed;
     bullet.pData.dY = ySpeed;
     bullet.pData.hitBoxSizeY = 16;
+    bullet.pData.eBits = eBits;
 
     oamSet(bullet.sData.oamID, bullet.pData.scrX, bullet.pData.scrY, 3, 0, 0, 0, 0);
     oamSetEx(bullet.sData.oamID, OBJ_SMALL, 1);
@@ -111,13 +115,14 @@ s_objectData Bullet_Init(u8 x, u8 y, sfx xSpeed, sfx ySpeed, Level* lvl) {
 x, y	        ;	Starting position.
 sizeX, sizeY	;	Size.
 */
-s_objectData Collider_Init(u8 x, u8 y, u8 sizeX, u8 sizeY, Level* lvl) {
+s_objectData Collider_Init(u8 x, u8 y, u8 sizeX, u8 sizeY, u8 eBits, Level* lvl) {
     // Init collider.
     s_objectData collider = generic_init_obj(OBJECT_COLLIDER, x, y, 0, 0, 0, NULL, NULL);
 
     collider.pData.hitBoxSizeX = sizeX;
     collider.pData.hitBoxSizeY = sizeY;
     collider.aData.sprState = 0;
+    collider.pData.eBits = eBits;
 
     return collider;
 }
@@ -199,6 +204,7 @@ u16 CheckCollision_obj_obj(s_objectData *objA, s_objectData *objB) {
     if (objALeft < objBRight && objARight > objBLeft && objATop < objBBottom && objABottom > objBTop) {
         collision_result |= 1;
         collision_result |= (objB->objID & 0b1111111) << 1;
+        collision_result |= (objB->pData.eBits & 0b1111) << 12;
 
         // This looks expensive...
         if(objBLeft <= objARight && objARight - objBLeft < 2) {
@@ -222,7 +228,8 @@ u16 CheckCollision_obj_obj(s_objectData *objA, s_objectData *objB) {
     finish_collision:
 
     // Ends up looking like
-    // 0000tblr iiiiiiic
+    // eeeetblr iiiiiiic
+    // e - extra bits
     // t - collision on top of objA
     // b - collision on bottom of objA
     // l - collision on left of objA
@@ -323,9 +330,9 @@ void player_tick(u16 pad0, s_objectData *player, Level* level) {
 			player->aData.sprState = PS_DOWN;
 		}
 
-        if(pad0 & KEY_Y && player->pData.b == 0) {
+        if(pad0 & KEY_Y && player->pData.genTimer == 0) {
             spawn_bullet(player, level);
-            player->pData.b = 16;
+            player->pData.genTimer = 16;
         }
 
         // Shooting
@@ -334,8 +341,8 @@ void player_tick(u16 pad0, s_objectData *player, Level* level) {
 		player->aData.frameTimer++;
     }
 
-    if(player->pData.b > 0) {
-        --player->pData.b;
+    if(player->pData.genTimer > 0) {
+        --player->pData.genTimer;
     }
 
     player->pData.wX += player->pData.dX;
@@ -356,16 +363,16 @@ void player_tick(u16 pad0, s_objectData *player, Level* level) {
 void spawn_bullet(s_objectData* obj, Level* lvl) {
     if(obj->aData.sprState == PS_SIDE) {
         if(obj->sData.hFlip == 0) {
-            add_obj_to_lvl(Bullet_Init(obj->pData.scrX, obj->pData.scrY, CharToSFX(1, 0), CharToSFX(0, 0), lvl), lvl);
+            add_obj_to_lvl(Bullet_Init(obj->pData.scrX, obj->pData.scrY, CharToSFX(1, 0), CharToSFX(0, 0), 0, lvl), lvl);
         } else {
-            add_obj_to_lvl(Bullet_Init(obj->pData.scrX, obj->pData.scrY, CharToSFX(-1, 0), CharToSFX(0, 0), lvl), lvl);
+            add_obj_to_lvl(Bullet_Init(obj->pData.scrX, obj->pData.scrY, CharToSFX(-1, 0), CharToSFX(0, 0), 0, lvl), lvl);
         }
     }
     if(obj->aData.sprState == PS_UP) {
-        add_obj_to_lvl(Bullet_Init(obj->pData.scrX, obj->pData.scrY, CharToSFX(0, 0), CharToSFX(-1, 0), lvl), lvl);
+        add_obj_to_lvl(Bullet_Init(obj->pData.scrX, obj->pData.scrY, CharToSFX(0, 0), CharToSFX(-1, 0), 0, lvl), lvl);
     }
     if(obj->aData.sprState == PS_DOWN) {
-        add_obj_to_lvl(Bullet_Init(obj->pData.scrX, obj->pData.scrY, CharToSFX(0, 0), CharToSFX(1, 0), lvl), lvl);
+        add_obj_to_lvl(Bullet_Init(obj->pData.scrX, obj->pData.scrY, CharToSFX(0, 0), CharToSFX(1, 0), 0, lvl), lvl);
     }
 }
 
@@ -401,6 +408,9 @@ void target_draw(s_objectData *target) {
 
 void bullet_tick(u16 pad0, s_objectData *bullet, Level* level) {
     u8 collision_dirs = Collide_obj_colliders(bullet, level);
+
+    // bullet only collides with collider type 0
+    if((collision_dirs & 0b01110000) > 0) collision_dirs = 0;
 
     if((collision_dirs & 0b1111) > 0) {
         obj_kill(bullet);

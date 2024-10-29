@@ -44,6 +44,6 @@ enum PlayerStates {
 enum SoulStates{
 	SS_IDLE = 0,
 	SS_DEAD = 2
-}
+};
 
 #endif

@@ -51,7 +51,7 @@ typedef struct {
   s8 hitBoxOffsetX, hitBoxOffsetY;
   u8 hitBoxSizeX, hitBoxSizeY;
 
-  u16 l, r, t, b; // debugging vars, redundant but helpful
+  u16 eBits, r, t, genTimer;
 } s_physicsData;
 
 typedef struct {

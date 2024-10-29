@@ -16,10 +16,10 @@ enum COLLISION_RESULT_DIR {
     COLLISION_RIGHT = 0b0001
 };
 
-s_objectData Target_Init(u8 x, u8 y, ufx speed, Level* lvl);
-s_objectData Player_Init(u8 x, u8 y, ufx speed, Level* lvl);
-s_objectData Bullet_Init(u8 x, u8 y, sfx xSpeed, sfx ySpeed, Level* lvl);
-s_objectData Collider_Init(u8 x, u8 y, u8 sizeX, u8 sizeY, Level* lvl);
+s_objectData Target_Init(u8 x, u8 y, ufx speed, u8 eBits, Level* lvl);
+s_objectData Player_Init(u8 x, u8 y, ufx speed, u8 eBits, Level* lvl);
+s_objectData Bullet_Init(u8 x, u8 y, sfx xSpeed, sfx ySpeed, u8 eBits, Level* lvl);
+s_objectData Collider_Init(u8 x, u8 y, u8 sizeX, u8 sizeY, u8 eBits, Level* lvl);
 
 void add_obj_to_lvl(s_objectData obj, Level *level);
 void clear_lvl_objs(Level *level);

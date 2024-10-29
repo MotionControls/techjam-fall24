@@ -150,13 +150,13 @@ Level Level_Init(u8 id) {
         if(objDef.id  == (u8)-1) break;
         switch(objDef.id) {
             case OBJECT_PLAYER:
-                add_obj_to_lvl(Player_Init(objDef.x, objDef.y, CharToUFX(1, 0), &loaded_level), &loaded_level);
+                add_obj_to_lvl(Player_Init(objDef.x, objDef.y, CharToUFX(1, 0), objDef.extra_bits, &loaded_level), &loaded_level);
                 break;
             case OBJECT_TARGET:
-                add_obj_to_lvl(Target_Init(objDef.x, objDef.y, CharToUFX(1, 0), &loaded_level), &loaded_level);
+                add_obj_to_lvl(Target_Init(objDef.x, objDef.y, CharToUFX(1, 0), objDef.extra_bits, &loaded_level), &loaded_level);
                 break;
             case OBJECT_COLLIDER:
-                add_obj_to_lvl(Collider_Init(objDef.x, objDef.y, objDef.sizeX, objDef.sizeY, &loaded_level), &loaded_level);
+                add_obj_to_lvl(Collider_Init(objDef.x, objDef.y, objDef.sizeX, objDef.sizeY, objDef.extra_bits, &loaded_level), &loaded_level);
                 break;
         }
         ++i;
