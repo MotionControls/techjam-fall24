@@ -14,7 +14,7 @@ typedef struct {
     s_objDef objects[LEVEL_MAX_OBJECTS];
 } s_levelDef;
 
-s_levelDef levelDefs[5] = {
+s_levelDef levelDefs[6] = {
     {
         {
             {
@@ -330,6 +330,47 @@ s_levelDef levelDefs[5] = {
                 13*16, 4*16,
                 1*16, 1*16,
                 0
+            },
+            {-1}
+        }
+    },
+    {
+        {
+            {
+                OBJECT_PLAYER,
+                3*16, 4*16,
+                0, 0,
+                0
+            },
+            {
+                OBJECT_TARGET,
+                12*16, 9*16,
+                0, 0,
+                0
+            },
+            {
+                OBJECT_ANGLE,
+                13*16, 4*16,
+                1*16, 1*16,
+                0
+            },
+            {
+                OBJECT_ANGLE,
+                7*16, 4*16,
+                1*16, 1*16,
+                1
+            },
+            {
+                OBJECT_ANGLE,
+                7*16, 7*16,
+                1*16, 1*16,
+                2
+            },
+            {
+                OBJECT_ANGLE,
+                13*16, 7*16,
+                1*16, 1*16,
+                3
             },
             {-1}
         }

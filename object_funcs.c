@@ -453,14 +453,22 @@ void bullet_tick(u16 pad0, s_objectData *bullet, Level* level) {
     collision_dirs = Collide_obj_angles(bullet, level);
     u8 angle = (collision_dirs & 0b01110000) >> 4;
     if((collision_dirs & 0b1111) > 0) {
-        if(angle == 0 && bullet->pData.dX > 0) {
+        if(angle == 0 && bullet->pData.dX != 0) {
             bullet->pData.dY = bullet->pData.dX;
             bullet->pData.dX = 0;
         }
-        // if(angle == 1 && bullet->pData.dX > 0) {
-        //     bullet->pData.dY = bullet->pData.dX;
-        //     bullet->pData.dX = 0;
-        // }
+        if(angle == 1 && bullet->pData.dX != 0) {
+            bullet->pData.dY = -bullet->pData.dX;
+            bullet->pData.dX = 0;
+        }
+        if(angle == 2 && bullet->pData.dY != 0) {
+            bullet->pData.dX = bullet->pData.dY;
+            bullet->pData.dY = 0;
+        }
+        if(angle == 3 && bullet->pData.dY != 0) {
+            bullet->pData.dX = -bullet->pData.dY;
+            bullet->pData.dY = 0;
+        }
     }
 
     bullet->pData.wX += bullet->pData.dX;

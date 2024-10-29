@@ -44,7 +44,7 @@ void Level_Tick(u16 pad0, Level *level);
 void BG_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8 *map, u16 mapSize, u16 mapMem);
 void TLD_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8* tldMap, u8* tldTiles, u8* tldProps, u8 mapTileSize);
 
-u8 level_num = 4;
+u8 level_num = 5;
 
 int main(void) {
     // Init SNES
