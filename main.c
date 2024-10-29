@@ -92,7 +92,8 @@ int main(void) {
         pad0 = padsCurrent(0);
 
         // mapUpdate();
-        // mapUpdateCamera(0, 0);
+        mapUpdateCamera(0, 0);
+        bgSetScroll(0, 0, 0);
 
         Level_Tick(pad0, &cur_level);
 
