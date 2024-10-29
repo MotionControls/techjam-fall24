@@ -33,13 +33,6 @@ extern char level5bg, level5bg_end;
 extern char level5pal, level5pal_end;
 extern char level5map, level5map_end;
 
-// TILED
-/*
-extern char tiled_testbg, tiled_testbg_end;
-extern char tiled_testpal, tiled_testpal_end;
-extern char tiled_testmap, tiled_testtiles, tiled_testprops;
-*/
-
 // Font
 extern char snesfont, snespal;
 
@@ -62,7 +55,7 @@ void Level_Tick(u16 pad0, Level *level);
 void BG_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8 *map, u16 mapSize, u16 mapMem);
 void TLD_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8* tldMap, u8* tldTiles, u8* tldProps, u8 mapTileSize);
 
-u8 level_num = 5;
+u8 level_num = 0;
 
 int main(void) {
     // Init SNES
@@ -86,11 +79,6 @@ int main(void) {
         MEM_BACKGROUNDS,
         &level1map, BG_MAP_SIZE,
         MEM_MAPS);
-	
-    // This needs to be done after ANY new backgrounds are loaded.
-    // All accessible backgrounds are enabled by default.
-    bgSetDisable(1);
-    bgSetDisable(2);
 
     setScreenOn();
 
@@ -135,6 +123,7 @@ void Level_Tick(u16 pad0, Level *level) {
         ++level_num;
         cur_level = Level_Init(level_num);
     }
+	//bgSetScroll(0, 0, 0);
 }
 
 void handle_obj(s_objDef objDef, Level* lvl) {
@@ -175,7 +164,30 @@ Level Level_Init(u8 id) {
         handle_obj(objDef, &loaded_level);
         ++i;
     }
-    return loaded_level;
+    
+	// Some very gross hardcoding.
+	switch(id){
+		case 0:
+			BG_Change(0, &level1bg, (&level1bg_end - &level1bg), &level1pal, (&level1pal_end - &level1pal), 0, MEM_BACKGROUNDS, &level1map, BG_MAP_SIZE, MEM_MAPS);
+		break;
+		case 1:
+			BG_Change(0, &level2bg, (&level2bg_end - &level2bg), &level2pal, (&level2pal_end - &level2pal), 0, MEM_BACKGROUNDS, &level2map, BG_MAP_SIZE, MEM_MAPS);
+		break;
+		case 2:
+			BG_Change(0, &level3bg, (&level3bg_end - &level3bg), &level3pal, (&level3pal_end - &level3pal), 0, MEM_BACKGROUNDS, &level3map, BG_MAP_SIZE, MEM_MAPS);
+		break;
+		case 3:
+			BG_Change(0, &level4bg, (&level4bg_end - &level4bg), &level4pal, (&level4pal_end - &level4pal), 0, MEM_BACKGROUNDS, &level4map, BG_MAP_SIZE, MEM_MAPS);
+		break;
+		case 4:
+			BG_Change(0, &level5bg, (&level5bg_end - &level5bg), &level5pal, (&level5pal_end - &level5pal), 0, MEM_BACKGROUNDS, &level5map, BG_MAP_SIZE, MEM_MAPS);
+		break;
+		case 5:
+			BG_Change(0, &level1bg, (&level1bg_end - &level1bg), &level1pal, (&level1pal_end - &level1pal), 0, MEM_BACKGROUNDS, &level1map, BG_MAP_SIZE, MEM_MAPS);
+		break;
+	}
+	
+	return loaded_level;
 }
 
 /*	void BG_Change(index, tiles, tilesSize, palette, paletteSize, paletteBank, tileMem, map, mapSize, mapMem);
@@ -194,6 +206,11 @@ mapMem		;	Where to store the map in memory.
 void BG_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8 *map, u16 mapSize, u16 mapMem) {
     bgInitTileSet(index, tiles, palette, paletteBank, tilesSize, paletteSize, BG_16COLORS, tileMem);
     bgInitMapSet(index, map, mapSize, SC_32x32, mapMem);
+	// This needs to be done after ANY new backgrounds are loaded.
+    // All accessible backgrounds are enabled by default.
+    bgSetDisable(1);
+    bgSetDisable(2);
+	setScreenOn();
 }
 
 /*	void TLD_Change(index, tiles, tilesSize, palette, paletteSize, paletteBank, tileMem, tldMap, tldTiles, tildProps, mapTileSize);
