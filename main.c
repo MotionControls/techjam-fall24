@@ -13,6 +13,10 @@ extern char sheepspr, sheepspr_end;
 extern char sheeppal, sheeppal_end;
 
 // BGs
+extern char cloudsbg, cloudsbg_end;
+extern char cloudspal, cloudspal_end;
+extern char cloudsmap, cloudsmap_end;
+
 extern char level1bg, level1bg_end;
 extern char level1pal, level1pal_end;
 extern char level1map, level1map_end;
@@ -79,6 +83,13 @@ int main(void) {
         MEM_BACKGROUNDS,
         &level1map, BG_MAP_SIZE,
         MEM_MAPS);
+	BG_Change(
+        1,
+        &cloudsbg, (&cloudsbg_end - &cloudsbg),
+        &cloudspal, (&cloudspal_end - &cloudspal), 1,
+        0x6A00,
+        &cloudsmap, (&cloudsmap_end - &cloudsmap),
+        0x0800);
 
     setScreenOn();
 
@@ -209,7 +220,7 @@ void BG_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize,
     bgInitMapSet(index, map, mapSize, SC_32x32, mapMem);
 	// This needs to be done after ANY new backgrounds are loaded.
     // All accessible backgrounds are enabled by default.
-    bgSetDisable(1);
+    //bgSetDisable(1);
     bgSetDisable(2);
 	setScreenOn();
 }

@@ -43,6 +43,9 @@ soul.pic: res/AngelAngle/soul_sprites.png
 	# @echo convert bmp ... $(notdir $@)
 	# $(GFXCONV) -s 8 -o 16 -u 16 -e 0 -t bmp -p -m -i $<
 
+clouds.pic: res/iomor.png
+	@echo convert bmp ... $(notdir $@)
+	$(GFXCONV) -s 8 -o 16 -u 16 -e 1 -p -m -i $<
 level1.pic: res/LevelConcepts/concept1.png
 	@echo convert bmp ... $(notdir $@)
 	$(GFXCONV) -s 8 -o 16 -u 16 -e 0 -p -m -i $<
@@ -77,4 +80,4 @@ level5.pic: res/LevelConcepts/concept6.png
 	# @echo convert map tiled ... $(notdir $@)
 	# $(TMXCONV) $< res/LevelConcepts/WallTileset.map
 
-bitmaps : john.pic sheep.pic bullet.pic soul.pic level1.pic level2.pic level3.pic level4.pic level5.pic
+bitmaps : john.pic sheep.pic bullet.pic soul.pic level1.pic level2.pic level3.pic level4.pic level5.pic clouds.pic

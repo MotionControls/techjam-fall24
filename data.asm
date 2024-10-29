@@ -16,17 +16,17 @@ johnpal_end:
 ;;;;;;;;;;;;;;;
 ; Backgrounds ;
 ;;;;;;;;;;;;;;;
-; iconsbg:
-; .incbin "res/bg_icons.pic"
-; iconsbg_end:
+cloudsbg:
+.incbin "res/iomor.pic"
+cloudsbg_end:
 
-; iconspal:
-; .incbin "res/bg_icons.pal"
-; iconspal_end:
+cloudspal:
+.incbin "res/iomor.pal"
+cloudspal_end:
 
-; iconsmap:
-; .incbin "res/bg_icons.map"
-; iconsmap_end:
+cloudsmap:
+.incbin "res/iomor.map"
+cloudsmap_end:
 
 ;;;;;;;;;;;;;;;;
 ; TILED Stuffs ;
