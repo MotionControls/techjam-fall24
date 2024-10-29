@@ -13,14 +13,16 @@ extern char sheepspr, sheepspr_end;
 extern char sheeppal, sheeppal_end;
 
 // BGs
-extern char iconsbg, iconsbg_end;
-extern char iconspal, iconspal_end;
-extern char iconsmap, iconsmap_end;
+extern char level1bg, level1bg_end;
+extern char level1pal, level1pal_end;
+extern char level1map, level1map_end;
 
 // TILED
+/*
 extern char tiled_testbg, tiled_testbg_end;
 extern char tiled_testpal, tiled_testpal_end;
 extern char tiled_testmap, tiled_testtiles, tiled_testprops;
+*/
 
 // Font
 extern char snesfont, snespal;
@@ -30,7 +32,7 @@ extern char snesfont, snespal;
 #define RES_Y 224
 
 // BG Stuffs
-#define BG_MAP_SIZE (&iconsmap_end - &iconsmap) // Given each background is 256x256, they should all very conveniently have the same map size.
+#define BG_MAP_SIZE (&level1map_end - &level1map) // Given each background is 256x256, they should all very conveniently have the same map size.
 
 // Init globals.
 Level levels[1];     // Level Array
@@ -61,25 +63,14 @@ int main(void) {
     cur_level = Level_Init(level_num);
 
     //Init BG stuffs.
-	/*
     BG_Change(
         0,
-        &iconsbg, (&iconsbg_end - &iconsbg),
-        &iconspal, (&iconspal_end - &iconspal), 0,
+        &level1bg, (&level1bg_end - &level1bg),
+        &level1pal, (&level1pal_end - &level1pal), 0,
         MEM_BACKGROUNDS,
-        &iconsmap, BG_MAP_SIZE,
+        &level1map, BG_MAP_SIZE,
         MEM_MAPS);
-	*/
-	TLD_Change(
-		0,
-		&tiled_testbg, (&tiled_testbg_end - &tiled_testbg),
-		&tiled_testpal, (&tiled_testpal_end - &tiled_testpal), 0,
-		0x0000,
-		(u8*)&tiled_testmap,
-		(u8*)&tiled_testtiles,
-		(u8*)&tiled_testprops,
-		SC_32x32);
-
+	
     // This needs to be done after ANY new backgrounds are loaded.
     // All accessible backgrounds are enabled by default.
     bgSetDisable(1);

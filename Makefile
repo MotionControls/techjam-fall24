@@ -39,17 +39,30 @@ soul.pic: res/AngelAngle/soul_sprites.png
 	-mv res/AngelAngle/soul_sprites.pal res/AngelAngle/soul_sprites_blue.pal
 	
 # BACKGROUNDS
-bg_icons.pic: res/bg_icons.bmp
+# bg_icons.pic: res/bg_icons.bmp
+	# @echo convert bmp ... $(notdir $@)
+	# $(GFXCONV) -s 8 -o 16 -u 16 -e 0 -t bmp -p -m -i $<
+
+level1.pic: res/LevelConcepts/concept1.png
 	@echo convert bmp ... $(notdir $@)
-	$(GFXCONV) -s 8 -o 16 -u 16 -e 0 -t bmp -p -m -i $<
+	$(GFXCONV) -s 8 -o 16 -u 16 -e 0 -p -m -i $<
+
 
 # TILED Stuffs
-tiled_testset.pic: res/tiled_testset.png
-	@echo convert map tileset ... $(notdir $@)
-	$(GFXCONV) -s 8 -o 16 -u 16 -p -m -i $<
+# tiled_testset.pic: res/tiled_testset.png
+	# @echo convert map tileset ... $(notdir $@)
+	# $(GFXCONV) -s 8 -o 16 -u 16 -p -m -i $<
 
-tiled_test.m16: res/tiled_test.tmj tiled_testset.pic
-	@echo convert map tiled ... $(notdir $@)
-	$(TMXCONV) $< res/tiled_testset.map
+# tiled_test.m16: res/tiled_test.tmj tiled_testset.pic
+	# @echo convert map tiled ... $(notdir $@)
+	# $(TMXCONV) $< res/tiled_testset.map
 
-bitmaps : john.pic bg_icons.pic tiled_test.m16 tiled_testset.pic sheep.pic bullet.pic soul.pic
+# wall_tileset.pic:	res/LevelConcepts/WallTileset.png
+	# @echo convert map tileset ... $(notdir $@)
+	# $(GFXCONV) -s 8 -o 16 -u 16 -p -m -i $<
+
+# tldLevel1.m16: res/LevelConcepts/concept1.tmj wall_tileset.pic
+	# @echo convert map tiled ... $(notdir $@)
+	# $(TMXCONV) $< res/LevelConcepts/WallTileset.map
+
+bitmaps : john.pic sheep.pic bullet.pic soul.pic level1.pic
