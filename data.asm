@@ -111,13 +111,51 @@ soulbluepal_end:
 level1bg:
 .incbin "res/LevelConcepts/concept1.pic"
 level1bg_end:
-
 level1pal:
 .incbin "res/LevelConcepts/concept1.pal"
 level1pal_end:
-
 level1map:
 .incbin "res/LevelConcepts/concept1.map"
 level1map_end:
+
+level2bg:
+.incbin "res/LevelConcepts/concept2.pic"
+level2bg_end:
+level2pal:
+.incbin "res/LevelConcepts/concept2.pal"
+level2pal_end:
+level2map:
+.incbin "res/LevelConcepts/concept2.map"
+level2map_end:
+
+level3bg:
+.incbin "res/LevelConcepts/concept3.pic"
+level3bg_end:
+level3pal:
+.incbin "res/LevelConcepts/concept3.pal"
+level3pal_end:
+level3map:
+.incbin "res/LevelConcepts/concept3.map"
+level3map_end:
+
+level4bg:
+.incbin "res/LevelConcepts/concept4.pic"
+level4bg_end:
+level4pal:
+.incbin "res/LevelConcepts/concept4.pal"
+level4pal_end:
+level4map:
+.incbin "res/LevelConcepts/concept4.map"
+level4map_end:
+
+level5bg:
+.incbin "res/LevelConcepts/concept6.pic"
+level5bg_end:
+level5pal:
+.incbin "res/LevelConcepts/concept6.pal"
+level5pal_end:
+level5map:
+.incbin "res/LevelConcepts/concept6.map"
+level5map_end:
 
 .ends

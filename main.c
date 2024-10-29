@@ -17,6 +17,22 @@ extern char level1bg, level1bg_end;
 extern char level1pal, level1pal_end;
 extern char level1map, level1map_end;
 
+extern char level2bg, level2bg_end;
+extern char level2pal, level2pal_end;
+extern char level2map, level2map_end;
+
+extern char level3bg, level3bg_end;
+extern char level3pal, level3pal_end;
+extern char level3map, level3map_end;
+
+extern char level4bg, level4bg_end;
+extern char level4pal, level4pal_end;
+extern char level4map, level4map_end;
+
+extern char level5bg, level5bg_end;
+extern char level5pal, level5pal_end;
+extern char level5map, level5map_end;
+
 // TILED
 /*
 extern char tiled_testbg, tiled_testbg_end;
