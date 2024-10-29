@@ -1,3 +1,14 @@
+/*	TODO
+- Better documentation.
+- General cleanup.
+- Fix lag.
+- Fix collisions to better match level tiles.
+- Functional shooting animations.
+- Fix objs only drawing the sheep.
+- Fix random junk data appearing in code.
+- Fix cloud background not showing.
+*/
+
 // https://github.com/alekmaul/pvsneslib/wiki
 
 #include <snes.h>
