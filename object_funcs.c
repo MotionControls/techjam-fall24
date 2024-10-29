@@ -154,7 +154,7 @@ void add_obj_to_lvl(s_objectData obj, Level *level) {
 void clear_lvl_objs(Level *level) {
     u8 i = 0;
     while(i < LEVEL_MAX_OBJECTS) {
-        level->data->objects[i].aData.sprState = 255;
+        obj_kill(&level->data->objects[i]);
         ++i;
     }
 }
