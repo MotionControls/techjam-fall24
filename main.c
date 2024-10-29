@@ -91,6 +91,7 @@ int main(void) {
     // All accessible backgrounds are enabled by default.
     bgSetDisable(1);
     bgSetDisable(2);
+    bgSetScroll(0, 0, 0);
 
     setScreenOn();
 
@@ -104,7 +105,8 @@ int main(void) {
         pad0 = padsCurrent(0);
 
         // mapUpdate();
-        // mapUpdateCamera(0, 0);
+        mapUpdateCamera(0, 0);
+        bgSetScroll(0, 0, 0);
 
         Level_Tick(pad0, &cur_level);
 
