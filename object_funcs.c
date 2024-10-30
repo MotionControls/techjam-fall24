@@ -1,14 +1,6 @@
 #include "object_funcs.h"
 #include "sprites.h"
-
-extern char sheepspr, sheepspr_end;
-extern char sheeppal, sheeppal_end;
-
-extern char bulletspr, bulletspr_end;
-extern char bulletbluepal, bulletbluepal_end;
-
-extern char soulspr, soulspr_end;
-extern char soulbluepal, soulbluepal_end;
+#include "externs.h"
 
 /*	Player Target_Init(x, y, speed);
 	Returns a target struct.
