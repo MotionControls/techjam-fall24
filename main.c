@@ -39,36 +39,8 @@ void TLD_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize
 u8 level_num = 0;
 
 int main(void) {
-    // Init SNES
-    // consoleInit();
-    //    consoleSetTextVramBGAdr(MEM_CONSOLE);
-    //    consoleSetTextVramAdr(0x3000);
-    //    consoleSetTextOffset(0x0100);
-    //    consoleInitText(0, 16 * 2, &snesfont, &snespal);
-
-    // Init player.
-    // The OAM can only be used AFTER consoleInit so this should be done afterwards.
-    //    s_objectData player = Player_Init(100, 100, CharToUFX(1, 0));
-    //    s_objectData target = Target_Init(100, 100, CharToUFX(0, 0));
-    cur_level = Level_Init(level_num);
-
-    //Init BG stuffs.
-    BG_Change(
-        0,
-        &level1bg, (&level1bg_end - &level1bg),
-        &level1pal, (&level1pal_end - &level1pal), 0,
-        MEM_BACKGROUNDS,
-        &level1map, BG_MAP_SIZE,
-        MEM_MAPS);
-	BG_Change(
-        1,
-        &cloudsbg, (&cloudsbg_end - &cloudsbg),
-        &cloudspal, (&cloudspal_end - &cloudspal), 1,
-        0x6A00,
-        &cloudsmap, (&cloudsmap_end - &cloudsmap),
-        0x0800);
-
-    setScreenOn();
+    // Init first level.
+	cur_level = Level_Init(level_num);
 
     // Activate Mode1 and set tile size to 8x8.
     setMode(BG_MODE1, 0);
@@ -79,18 +51,9 @@ int main(void) {
         storePad0 = pad0;
         pad0 = padsCurrent(0);
 
-        // mapUpdate();
-        mapUpdateCamera(0, 0);
-        bgSetScroll(0, 0, 0);
-
-        Level_Tick(pad0, &cur_level);
-
-		// For whatever reason with the map engine this needs to be done every frame.
-		bgSetDisable(1);
-		bgSetDisable(2);
+		Level_Tick(pad0, &cur_level);
 
         WaitForVBlank();
-        mapVblank();
     }
     return 0;
 }
@@ -112,7 +75,6 @@ void Level_Tick(u16 pad0, Level *level) {
         ++level_num;
         cur_level = Level_Init(level_num);
     }
-	//bgSetScroll(0, 0, 0);
 }
 
 void handle_obj(s_objDef objDef, Level* lvl) {
@@ -195,23 +157,6 @@ mapMem		;	Where to store the map in memory.
 void BG_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8 *map, u16 mapSize, u16 mapMem) {
     bgInitTileSet(index, tiles, palette, paletteBank, tilesSize, paletteSize, BG_16COLORS, tileMem);
     bgInitMapSet(index, map, mapSize, SC_32x32, mapMem);
-	// This needs to be done after ANY new backgrounds are loaded.
-    // All accessible backgrounds are enabled by default.
-    //bgSetDisable(1);
-    bgSetDisable(2);
-	setScreenOn();
-}
-
-/*	void TLD_Change(index, tiles, tilesSize, palette, paletteSize, paletteBank, tileMem, tldMap, tldTiles, tildProps, mapTileSize);
-	Changes the background at index, using the PV's MAP engine.
-...			;	Shared with BG_Change().
-tldMap		;	TILED map data.
-tldTiles	;	TILED tile data.
-tldProps	;	TILED tile property data.
-mapTileSize	;	Size of the map in 8x8 tiles.
-*/
-void TLD_Change(u8 index, u8 *tiles, u16 tilesSize, u8 *palette, u16 paletteSize, u8 paletteBank, u16 tileMem, u8* tldMap, u8* tldTiles, u8* tldProps, u8 mapTileSize){
-	bgInitTileSet(index, tiles, palette, paletteBank, tilesSize, paletteSize, BG_16COLORS, tileMem);
-    bgSetMapPtr(index, 0x6800, mapTileSize);	// The MAP is required by the map engine to be at location 0x6800.
-	mapLoad(tldMap, tldTiles, tldProps);
+	bgSetDisable(2);	// This disables BG1. Important since it points to 0x0000 and that's where we store the MAP for the level.
+	setScreenOn();		// Turns the screen on. Has to be done everytime a new BG is loaded.
 }
