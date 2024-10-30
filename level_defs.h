@@ -2,6 +2,7 @@
 #define LEVEL_DEFS_H
 #include <snes.h>
 #include "objects.h"
+#include "externs.h"
 
 typedef struct {
     u8 id;
@@ -12,10 +13,13 @@ typedef struct {
 
 typedef struct {
     s_objDef objects[LEVEL_MAX_OBJECTS];
+	u8 *bg, *pal, *map;
+	u16 bgSize, palSize;
 } s_levelDef;
 
 s_levelDef levelDefs[6] = {
-    {
+    // Level 1
+	{
         {
             {
                 OBJECT_PLAYER,
@@ -54,8 +58,11 @@ s_levelDef levelDefs[6] = {
                 0
             },
             {-1}
-        }
+        },
+		&level1bg, &level1pal, &level1map,
+		(&level1bg_end - &level1bg), (&level1pal_end - &level1pal)
     },
+	// Level 2
     {
         {
             {
@@ -143,8 +150,11 @@ s_levelDef levelDefs[6] = {
                 0
             },
             {-1}
-        }
+        },
+		&level2bg, &level2pal, &level2map,
+		(&level2bg_end - &level2bg), (&level2pal_end - &level2pal)
     },
+	// Level 3
     {
         {
             {
@@ -190,8 +200,11 @@ s_levelDef levelDefs[6] = {
                 1
             },
             {-1}
-        }
+        },
+		&level3bg, &level3pal, &level3map,
+		(&level3bg_end - &level3bg), (&level3pal_end - &level3pal)
     },
+	// Level 4
     {
         {
             {
@@ -279,8 +292,11 @@ s_levelDef levelDefs[6] = {
                 0
             },
             {-1}
-        }
+        },
+		&level4bg, &level4pal, &level4map,
+		(&level4bg_end - &level4bg), (&level4pal_end - &level4pal)
     },
+	// Level 5
     {
         {
             {
@@ -332,8 +348,11 @@ s_levelDef levelDefs[6] = {
                 0
             },
             {-1}
-        }
+        },
+		&level5bg, &level5pal, &level5map,
+		(&level5bg_end - &level5bg), (&level5pal_end - &level5pal)
     },
+	// Level 6
     {
         {
             {
@@ -373,7 +392,9 @@ s_levelDef levelDefs[6] = {
                 3
             },
             {-1}
-        }
+        },
+		&level1bg, &level1pal, &level1map,
+		(&level1bg_end - &level1bg), (&level1pal_end - &level1pal)
     }
 };
 
