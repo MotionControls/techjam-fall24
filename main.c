@@ -90,11 +90,13 @@ void handle_obj(s_objDef objDef, Level* lvl) {
 }
 
 Level Level_Init(u8 id) {
-    BG_Change(0, 
+    /*
+	BG_Change(0, 
 		levelDefs[id].bg, levelDefs[id].bgSize, 
 		levelDefs[id].pal, levelDefs[id].palSize, 0, 
 		MEM_BACKGROUNDS, 
 		levelDefs[id].map, BG_MAP_SIZE, MEM_MAPS);
+	*/
 	
 	u8 curObjID = 0;
     Level loaded_level = {
@@ -107,7 +109,7 @@ Level Level_Init(u8 id) {
         100,
         100
     };
-    clear_lvl_objs(&loaded_level);
+	clear_lvl_objs(&loaded_level);
 
     u8 i = 0;
     while(i < LEVEL_MAX_OBJECTS) {
@@ -116,12 +118,11 @@ Level Level_Init(u8 id) {
         handle_obj(objDef, &loaded_level);
         ++i;
     }
-    
-	/*
+	
 	// Some very gross hardcoding.
 	switch(id){
 		case 0:
-			BG_Change(0, levelDefs[i].bg, (&level1bg_end - &level1bg), &level1pal, (&level1pal_end - &level1pal), 0, MEM_BACKGROUNDS, &level1map, BG_MAP_SIZE, MEM_MAPS);
+			BG_Change(0, &level1bg, (&level1bg_end - &level1bg), &level1pal, (&level1pal_end - &level1pal), 0, MEM_BACKGROUNDS, &level1map, BG_MAP_SIZE, MEM_MAPS);
 		break;
 		case 1:
 			BG_Change(0, &level2bg, (&level2bg_end - &level2bg), &level2pal, (&level2pal_end - &level2pal), 0, MEM_BACKGROUNDS, &level2map, BG_MAP_SIZE, MEM_MAPS);
@@ -138,7 +139,7 @@ Level Level_Init(u8 id) {
 		case 5:
 			BG_Change(0, &level1bg, (&level1bg_end - &level1bg), &level1pal, (&level1pal_end - &level1pal), 0, MEM_BACKGROUNDS, &level1map, BG_MAP_SIZE, MEM_MAPS);
 		break;
-	}*/
+	}
 	
 	return loaded_level;
 }
