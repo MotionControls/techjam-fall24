@@ -1,5 +1,5 @@
 #include "object_funcs.h"
-#include "sprite_tables.h"
+#include "sprites.h"
 
 extern char sheepspr, sheepspr_end;
 extern char sheeppal, sheeppal_end;

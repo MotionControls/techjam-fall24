@@ -1,5 +1,5 @@
-#ifndef SPRITE_TABLES
-#define SPRITE_TABLES
+#ifndef SPRITES_H
+#define SPRITES_H
 
 // Sprite Tables
 // The way these tables work is that each value represents a point in memory from the OAM tileset.
