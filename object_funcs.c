@@ -459,7 +459,7 @@ void target_draw(s_objectData *target) {
 		target->sData.oamID,
 		target->pData.scrX, target->pData.scrY, 3,
 		target->sData.hFlip, target->sData.vFlip,
-		soulSpriteTable[target->aData.curFrame + target->aData.sprState], 2);
+		352, 2);
 }
 
 void bullet_tick(u16 pad0, s_objectData *bullet, Level* level) {

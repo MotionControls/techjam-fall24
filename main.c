@@ -14,6 +14,12 @@ As of right now it's a bit hard to understand what the current system is doing a
 longer I look at it the more I realize that it might be simpler just to have a struct per-object.
 It would be less modular and kinda gross, but it would probably make the game run better and fix
 the current sprite issues.
+
+No I am a FOOL.
+oamSet takes a gfx offset, NOT a memory address.
+So all of the sprite tables are wrong.
+The only reason I never noticed is because the only player sprites you see are the only sprites I set correctly.
+Ouch.
 */
 
 // https://github.com/alekmaul/pvsneslib/wiki
