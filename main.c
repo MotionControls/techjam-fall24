@@ -7,6 +7,13 @@
 - Fix objs only drawing the sheep.
 - Fix random junk data appearing in code.
 - Fix cloud background not showing.
+
+So I think a problem with the current backend is that it's a tad over-engineered.
+Including colliders, we only have 5 objects in the game.
+As of right now it's a bit hard to understand what the current system is doing and the
+longer I look at it the more I realize that it might be simpler just to have a struct per-object.
+It would be less modular and kinda gross, but it would probably make the game run better and fix
+the current sprite issues.
 */
 
 // https://github.com/alekmaul/pvsneslib/wiki
@@ -90,15 +97,7 @@ void handle_obj(s_objDef objDef, Level* lvl) {
 }
 
 Level Level_Init(u8 id) {
-    /*
-	BG_Change(0, 
-		levelDefs[id].bg, levelDefs[id].bgSize, 
-		levelDefs[id].pal, levelDefs[id].palSize, 0, 
-		MEM_BACKGROUNDS, 
-		levelDefs[id].map, BG_MAP_SIZE, MEM_MAPS);
-	*/
-	
-	u8 curObjID = 0;
+    u8 curObjID = 0;
     Level loaded_level = {
         0,
         0,
@@ -119,7 +118,18 @@ Level Level_Init(u8 id) {
         ++i;
     }
 	
+	/*
+	BG_Change(0, 
+		levelDefs[id].bg, levelDefs[id].bgSize, 
+		levelDefs[id].pal, levelDefs[id].palSize, 0, 
+		MEM_BACKGROUNDS, 
+		levelDefs[id].map, BG_MAP_SIZE, MEM_MAPS);
+	*/
+	
 	// Some very gross hardcoding.
+	// So I'd like to get the above to work but it's introducing tons of junk data.
+	// I don't really wanna keep working on this bit so this'll stay.
+	// It only effects level loading so I'm not as bothered by it.
 	switch(id){
 		case 0:
 			BG_Change(0, &level1bg, (&level1bg_end - &level1bg), &level1pal, (&level1pal_end - &level1pal), 0, MEM_BACKGROUNDS, &level1map, BG_MAP_SIZE, MEM_MAPS);

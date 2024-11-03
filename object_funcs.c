@@ -26,7 +26,7 @@ s_objectData Target_Init(u8 x, u8 y, ufx speed, u8 eBits, Level* lvl) {
     oamSetEx(target.sData.oamID, OBJ_SMALL, 1);
     oamSetVisible(target.sData.oamID, OBJ_SHOW);
 
-    target.aData.sprState = 0;
+    target.aData.sprState = SS_IDLE;
 
     return target;
 }
@@ -443,14 +443,23 @@ void target_tick(u16 pad0, s_objectData *target, Level* level) {
     target->pData.scrX = SFXToChar(target->pData.wX);
     target->pData.scrY = SFXToChar(target->pData.wY);
 
-    target->sData.visible = 1;//CheckCollision_obj_obj(&level->data->objects[0], target) & 1;
+    target->aData.frameTimer++;
+	if(target->aData.frameTimer > 60*2){
+		target->aData.frameTimer = 0;
+		target->aData.curFrame += (target->aData.curFrame == 1) ? -1 : 1;
+	}
+	//target->sData.visible = 1;//CheckCollision_obj_obj(&level->data->objects[0], target) & 1;
 }
 
 void target_draw(s_objectData *target) {
     //generic_draw(target);
 	
 	oamSetVisible(target->sData.oamID, target->sData.visible ? OBJ_SHOW : OBJ_HIDE);
-    oamSet(target->sData.oamID, target->pData.scrX, target->pData.scrY, 3, target->sData.hFlip, target->sData.vFlip, soulSpriteTable[target->aData.curFrame + target->aData.sprState], 2);
+    oamSet(
+		target->sData.oamID,
+		target->pData.scrX, target->pData.scrY, 3,
+		target->sData.hFlip, target->sData.vFlip,
+		soulSpriteTable[target->aData.curFrame + target->aData.sprState], 2);
 }
 
 void bullet_tick(u16 pad0, s_objectData *bullet, Level* level) {
@@ -493,7 +502,11 @@ void bullet_tick(u16 pad0, s_objectData *bullet, Level* level) {
 }
 
 void bullet_draw(s_objectData *bullet) {
-    generic_draw(bullet);
+    //generic_draw(bullet);
+	
+	oamSetVisible(bullet->sData.oamID, bullet->sData.visible ? OBJ_SHOW : OBJ_HIDE);
+	if(!bullet->sData.visible) return;
+	oamSet(bullet->sData.oamID, bullet->pData.scrX, bullet->pData.scrY, 3, bullet->sData.hFlip, bullet->sData.vFlip, 0x5400, 1);
 }
 
 void generic_draw(s_objectData *object) {
