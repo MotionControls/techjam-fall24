@@ -4,7 +4,8 @@
 - Fix lag.
 - Fix collisions to better match level tiles.
 - Functional shooting animations.
-- Fix objs only drawing the sheep.
+x Fix objs only drawing the sheep.
+-	Fix Bullet using wrong sprite size.
 - Fix random junk data appearing in code.
 - Fix cloud background not showing.
 

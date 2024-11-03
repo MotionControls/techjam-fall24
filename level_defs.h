@@ -21,8 +21,7 @@ s_levelDef levelDefs[6] = {
     // Level 1
 	{
         {
-            
-            {
+			{
                 OBJECT_PLAYER,
                 96, 96,
                 0, 0,

@@ -459,7 +459,7 @@ void target_draw(s_objectData *target) {
 		target->sData.oamID,
 		target->pData.scrX, target->pData.scrY, 3,
 		target->sData.hFlip, target->sData.vFlip,
-		352, 2);
+		soulSpriteTable[target->aData.sprState + target->aData.curFrame], 2);
 }
 
 void bullet_tick(u16 pad0, s_objectData *bullet, Level* level) {
@@ -506,7 +506,7 @@ void bullet_draw(s_objectData *bullet) {
 	
 	oamSetVisible(bullet->sData.oamID, bullet->sData.visible ? OBJ_SHOW : OBJ_HIDE);
 	if(!bullet->sData.visible) return;
-	oamSet(bullet->sData.oamID, bullet->pData.scrX, bullet->pData.scrY, 3, bullet->sData.hFlip, bullet->sData.vFlip, 0x5400, 1);
+	oamSet(bullet->sData.oamID, bullet->pData.scrX, bullet->pData.scrY, 3, bullet->sData.hFlip, bullet->sData.vFlip, bulletSpriteTable[bullet->aData.curFrame], 1);
 }
 
 void generic_draw(s_objectData *object) {
